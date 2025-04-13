@@ -1,7 +1,25 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using VotingSystem.DataAccess;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[] { new CultureInfo("hu-HU"), new CultureInfo("en-US") };
+    options.DefaultRequestCulture = new RequestCulture("hu-HU");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
+builder.Services.AddControllersWithViews()
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
+
+
+builder.Services.AddDataAccess(builder.Configuration);
+// builder.Services.AddWebAutomapper();
 
 var app = builder.Build();
 
@@ -23,5 +41,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<VotingSystemDbContext>();
+    DbInitializer.Initialize(context);
+}
 
 app.Run();
