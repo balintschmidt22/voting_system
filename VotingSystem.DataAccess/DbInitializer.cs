@@ -26,13 +26,13 @@ public static class DbInitializer
             {
                 FirstName = "John",
                 LastName = "Doe",
-                Email = "john.doe@gmail.com"
+                Email = "john.doe1@gmail.com"
             },
             new User
             {
                 FirstName = "John",
                 LastName = "Doe",
-                Email = "john.doe@gmail.com"
+                Email = "john.doe2@gmail.com"
             }
         ];
 
