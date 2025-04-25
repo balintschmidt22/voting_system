@@ -14,5 +14,8 @@ public class MappingProfile: Profile
     /// </summary>
     public MappingProfile()
     {
+        CreateMap<User, UserResponseDto>(MemberList.Destination);
+        
+        CreateMap<Vote, VoteResponseDto>(MemberList.Destination);
     }
 }

@@ -1,8 +1,12 @@
-﻿using AutoMapper;
+﻿using System.ComponentModel.DataAnnotations;
+using AutoMapper;
+using ELTE.Cinema.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using VotingSystem.DataAccess.Exceptions;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Models;
 
 namespace VotingSystem.WebAPI.Controllers;
 
@@ -13,52 +17,127 @@ namespace VotingSystem.WebAPI.Controllers;
 [Route("/users")]
 public class UsersController : ControllerBase
 {
-    private readonly IMapper _mapper;
     private readonly IUsersService _usersService;
+    private readonly IMapper _mapper;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="mapper"></param>
     /// <param name="usersService"></param>
-    public UsersController(IMapper mapper, 
-        IUsersService usersService)
+    public UsersController(IMapper mapper, IUsersService usersService)
     {
         _mapper = mapper;
         _usersService = usersService;
     }
-    
-    /// <summary>
-    /// Get all users in descending order by creation date
-    /// </summary>
-    /// <param name="count">An optional parameter to restrict the number of the returned users</param>
-    /// <response code="200">A list of users</response>
-    [HttpGet]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<UserResponseDto>))]
-    public async Task<IActionResult> GetUsers(int? count = null)
-    {
-        var users = await _usersService.GetLatestUsersAsync(count);
-        var userResponseDtos = _mapper.Map<List<UserResponseDto>>(users);
 
-        return Ok(userResponseDtos);
+    /// <summary>
+    /// Create a new user
+    /// </summary>
+    /// <param name="userRequestDto"></param>
+    /// <response code="201">User created successfully</response>
+    /// <response code="400">Bad Request</response>
+    /// <response code="409">Conflict</response>
+    [HttpPost]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(UserResponseDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CreateUser([FromBody] UserRequestDto userRequestDto)
+    {
+        var user = _mapper.Map<User>(userRequestDto);
+
+        await _usersService.AddUserAsync(user, userRequestDto.Password);
+
+        var userResponseDto = _mapper.Map<UserResponseDto>(user);
+
+        return StatusCode(StatusCodes.Status201Created, userResponseDto);
     }
 
     /// <summary>
-    /// Get a user by ID
+    /// Login
+    /// </summary>
+    /// <param name="loginRequestDto"></param>
+    /// <response code="200">Login was successful</response>
+    /// <response code="400">Bad Request</response>
+    /// <response code="403">Forbidden</response>
+    [HttpPost]
+    [Route("login")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(UserResponseDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequestDto)
+    {
+        var (authToken, refreshToken, userId) = await _usersService.LoginAsync(loginRequestDto.Email, loginRequestDto.Password);
+
+        var loginResponseDto = new LoginResponseDto
+        {
+            UserId = userId,
+            AuthToken = authToken,
+            RefreshToken = refreshToken,
+        };
+
+        return Ok(loginResponseDto);
+    }
+
+    /// <summary>
+    /// Logout
+    /// </summary>
+    /// <response code="200">Logout was successful</response>
+    /// <response code="401">Unauthorized</response>
+    [HttpPost]
+    [Route("logout")]
+    [Authorize]
+    [ProducesResponseType(statusCode: StatusCodes.Status204NoContent, type: typeof(void))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Logout()
+    {
+        await _usersService.LogoutAsync();
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Redeem refresh token
+    /// </summary>
+    /// <response code="200">Login was successful</response>
+    [HttpPost]
+    [Route("refresh")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(UserResponseDto))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> RedeemRefreshToken([FromBody] string refreshToken)
+    {
+        var (authToken, newRefreshToken, userId) = await _usersService.RedeemRefreshTokenAsync(refreshToken);
+
+        var loginResponseDto = new LoginResponseDto
+        {
+            UserId = userId,
+            AuthToken = authToken,
+            RefreshToken = newRefreshToken,
+        };
+
+        return Ok(loginResponseDto);
+    }
+    
+    /// <summary>
+    /// Get user by ID
     /// </summary>
     /// <param name="id"></param>
-    /// <response code="200">The requested user</response>
+    /// <response code="200">User</response>
+    /// <response code="401">Unauthorized</response>
+    /// <response code="403">Forbidden</response>
     /// <response code="404">Not found</response>
     [HttpGet]
     [Route("{id}")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(UserResponseDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetUserById([FromRoute] int id)
+    public async Task<IActionResult> GetUser([FromRoute][Required] string id)
     {
-        var user = await _usersService.GetByIdAsync(id);
+        var user = await _usersService.GetUserByIdAsync(id);
         var userResponseDto = _mapper.Map<UserResponseDto>(user);
 
         return Ok(userResponseDto);
     }
-    
 }

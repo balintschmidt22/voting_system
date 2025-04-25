@@ -1,25 +1,20 @@
 ﻿namespace VotingSystem.Shared.Models;
 
-public class UserResponseDto
+public record UserResponseDto
 {
-    /// <summary>
-    /// Unique identifier for the user
-    /// </summary>
-    public int Id { get; init; }
-
-    /// <summary>
-    /// 
-    /// </summary>
+    public required string Id { get; init; }
+    
     public required string FirstName { get; init; }
-
-    /// <summary>
-    /// 
-    /// </summary>
+    
     public required string LastName { get; init; }
     
     public required string UserName { get; init; }
     
-    //password
-
     public required string Email { get; init; }
+
+    public DateTime CreatedAt { get; init; }
+    
+    public DateTime UpdatedAt { get; init; }
+    
+    public DateTime DeletedAt { get; init; }
 }
