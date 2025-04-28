@@ -12,8 +12,8 @@ using VotingSystem.DataAccess;
 namespace VotingSystem.DataAccess.Migrations
 {
     [DbContext(typeof(VotingSystemDbContext))]
-    [Migration("20250425165330_InitUsers")]
-    partial class InitUsers
+    [Migration("20250427213127_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -132,6 +132,31 @@ namespace VotingSystem.DataAccess.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("VotingSystem.DataAccess.Models.AnonymousVote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("SelectedOption")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("VoteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("VoteId");
+
+                    b.ToTable("AnonymousVotes");
                 });
 
             modelBuilder.Entity("VotingSystem.DataAccess.Models.User", b =>
@@ -289,6 +314,33 @@ namespace VotingSystem.DataAccess.Migrations
                     b.ToTable("Votes");
                 });
 
+            modelBuilder.Entity("VotingSystem.DataAccess.Models.VoteParticipation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("VoteId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("VotedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("VoteId");
+
+                    b.ToTable("VoteParticipations");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("VotingSystem.DataAccess.Models.UserRole", null)
@@ -340,6 +392,17 @@ namespace VotingSystem.DataAccess.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("VotingSystem.DataAccess.Models.AnonymousVote", b =>
+                {
+                    b.HasOne("VotingSystem.DataAccess.Models.Vote", "Vote")
+                        .WithMany("AnonymousVotes")
+                        .HasForeignKey("VoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Vote");
+                });
+
             modelBuilder.Entity("VotingSystem.DataAccess.Models.Vote", b =>
                 {
                     b.HasOne("VotingSystem.DataAccess.Models.User", "User")
@@ -351,9 +414,37 @@ namespace VotingSystem.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("VotingSystem.DataAccess.Models.VoteParticipation", b =>
+                {
+                    b.HasOne("VotingSystem.DataAccess.Models.User", "User")
+                        .WithMany("VoteParticipations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VotingSystem.DataAccess.Models.Vote", "Vote")
+                        .WithMany("VoteParticipations")
+                        .HasForeignKey("VoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("Vote");
+                });
+
             modelBuilder.Entity("VotingSystem.DataAccess.Models.User", b =>
                 {
+                    b.Navigation("VoteParticipations");
+
                     b.Navigation("Votes");
+                });
+
+            modelBuilder.Entity("VotingSystem.DataAccess.Models.Vote", b =>
+                {
+                    b.Navigation("AnonymousVotes");
+
+                    b.Navigation("VoteParticipations");
                 });
 #pragma warning restore 612, 618
         }

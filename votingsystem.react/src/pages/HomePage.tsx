@@ -1,22 +1,20 @@
-import { getMovies } from "@/api/client/movies-client";
-import { getTodaysScreenings } from "@/api/client/screenings-client";
-import { MovieResponseDto } from "@/api/models/MovieResponseDto";
-import { ScreeningResponseDto } from "@/api/models/ScreeningResponseDto";
+import { getActiveVotes, getClosedVotes } from "@/api/client/votes-client.ts";
+import { VoteResponseDto } from "@/api/models/VoteResponseDto";
 import { ErrorAlert } from "@/components/alerts/ErrorAlert";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
-import { MoviesGrid } from "@/components/movies/MoviesGrid";
-import { ScreeningCard } from "@/components/screenings/ScreeningCard";
-import { useEffect, useState } from "react";
+import { VotesGrid } from "@/components/votes/VotesGrid";
+import { SetStateAction, useEffect, useState} from "react";
+import { useLocation } from "react-router-dom";
 
-const NUMBER_OF_LATEST_MOVIES = 5;
+//const NUMBER_OF_ACTIVE_VOTES = 5;
 
 /**
- * Home page that shows the latest movies and the screenings for today
+ * Home page that shows the active votes
  * @constructor
  */
 export function HomePage() {
-    const [movies, setMovies] = useState<MovieResponseDto[]>([]);
-    const [screenings, setScreenings] = useState<ScreeningResponseDto[]>([]);
+    const location = useLocation();
+    const [votes, setVotes] = useState<VoteResponseDto[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -25,12 +23,20 @@ export function HomePage() {
             setError(null);
             setIsLoading(true);
             try {
-                const [loadedMovies, loadedScreenings] = await Promise.all([
-                    getMovies(NUMBER_OF_LATEST_MOVIES),
-                    getTodaysScreenings()
-                ]);
-                setMovies(loadedMovies);
-                setScreenings(loadedScreenings);
+                let loadedVotes: SetStateAction<VoteResponseDto[]> = [];
+                
+                if (location.pathname === '/') {
+                    [loadedVotes] = await Promise.all([
+                        getActiveVotes(),
+                    ]);
+                } else if (location.pathname === '/votes/closed') {
+                    [loadedVotes] = await Promise.all([
+                        getClosedVotes(),
+                    ]);
+                } else {
+                    loadedVotes = [];
+                }
+                setVotes(loadedVotes);
             } catch (e) {
                 setError(e instanceof Error ? e.message : "Unknown error.");
             } finally {
@@ -39,7 +45,7 @@ export function HomePage() {
         }
         
         loadContent();
-    }, []);
+    }, [location.pathname]);
 
     // Render
     if (isLoading) {
@@ -49,16 +55,20 @@ export function HomePage() {
     return (
     <>
         {error ? <ErrorAlert message={error} /> : null}
-        <h1>Welcome to ELTE Cinema!</h1>
         
-        <h2>Latest movies</h2>
-        <MoviesGrid movies={movies} />
-        <h2>Today's program</h2>
-        {screenings.map(screening => <ScreeningCard
-            key={screening.id}
-            showMovieDetails
-            showReservationLink
-            screening={screening}
-        />)}
+        {location.pathname === '/' ?
+            <>
+                <h1>Welcome to the Anonymous Voting!</h1>
+                <h2>Active polls ({votes.length})</h2>
+            </>
+            : location.pathname === '/votes/closed' ? 
+            <>
+                <h1>Anonymous Voting</h1>
+                <h2>Closed polls ({votes.length})</h2>
+            </>
+            : <></>
+        }
+        
+        <VotesGrid votes={votes} />
     </>);
 }

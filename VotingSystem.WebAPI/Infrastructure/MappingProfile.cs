@@ -17,5 +17,9 @@ public class MappingProfile: Profile
         CreateMap<User, UserResponseDto>(MemberList.Destination);
         
         CreateMap<Vote, VoteResponseDto>(MemberList.Destination);
+        
+        CreateMap<VoteParticipation, VoteParticipationResponseDto>(MemberList.Destination);
+            
+        CreateMap<AnonymousVote, AnonymousVoteResponseDto>(MemberList.Destination);
     }
 }

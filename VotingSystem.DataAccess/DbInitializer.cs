@@ -118,10 +118,19 @@ public static class DbInitializer
         {
             SeedUsersAsync(userManager).Wait();
         }
-
-
-        // Check if any movies already exist
+        
+        // Check if any votes already exist
         if (context.Votes.Any())
+        {
+            return;
+        }
+
+        if (context.AnonymousVotes.Any())
+        {
+            return;
+        }
+
+        if (context.VoteParticipations.Any())
         {
             return;
         }
@@ -153,16 +162,17 @@ public static class DbInitializer
 
         context.Users.AddRange(users);*/
         
-        var user = await userManager.FindByEmailAsync("johndoe@gmail.com");
+        var user1 = await userManager?.FindByEmailAsync("johndoe@gmail.com")!;
         var user2 = await userManager.FindByEmailAsync("user2@gmail.com");
+        var user3 = await userManager.FindByEmailAsync("test@gmail.com");
 
-        if (user != null && user2 != null)
+        if (user1 != null && user2 != null && user3 != null)
         {
             Vote[] votes =
             [
                 new Vote
                 {
-                    UserId = user.Id,
+                    UserId = user1.Id,
                     Question = "What is 1+1?",
                     Options = ["2", "3"],
                     Start = DateTime.Now - TimeSpan.FromHours(1),
@@ -178,7 +188,7 @@ public static class DbInitializer
                 },
                 new Vote
                 {
-                    UserId = user.Id,
+                    UserId = user1.Id,
                     Question = "What is the capital of the USA?",
                     Options = ["New York", "Los Angeles", "Washington DC", "Chicago"],
                     Start = DateTime.Now - TimeSpan.FromHours(1),
@@ -186,7 +196,89 @@ public static class DbInitializer
                 }
             ];
         
-            context.Votes.AddRange(votes);
+            await context.Votes.AddRangeAsync(votes);
+            await context.SaveChangesAsync();
+
+            AnonymousVote[] anonymousVotes = [
+                new AnonymousVote
+                {
+                    VoteId = 1,
+                    SelectedOption = "2"
+                },
+                new AnonymousVote
+                {
+                    VoteId = 3,
+                    SelectedOption = "New York"
+                },
+                new AnonymousVote
+                {
+                    VoteId = 3,
+                    SelectedOption = "Washington DC"
+                },
+                new AnonymousVote
+                {
+                    VoteId = 2,
+                    SelectedOption = "Nothing"
+                },
+                new AnonymousVote
+                {
+                    VoteId = 2,
+                    SelectedOption = "42"
+                },
+                new AnonymousVote
+                {
+                    VoteId = 1,
+                    SelectedOption = "2"
+                },
+                new AnonymousVote
+                {
+                    VoteId = 1,
+                    SelectedOption = "3"
+                }
+            ];
+            
+            await context.AnonymousVotes.AddRangeAsync(anonymousVotes);
+
+            VoteParticipation[] voteParticipations =
+            [
+                new VoteParticipation
+                {
+                    UserId = user1.Id,
+                    VoteId = 1,
+                },
+                new VoteParticipation
+                {
+                    UserId = user2.Id,
+                    VoteId = 1,
+                },
+                new VoteParticipation
+                {
+                    UserId = user3.Id,
+                    VoteId = 1,
+                },
+                new VoteParticipation
+                {
+                    UserId = user1.Id,
+                    VoteId = 2,
+                },
+                new VoteParticipation
+                {
+                    UserId = user3.Id,
+                    VoteId = 2,
+                },
+                new VoteParticipation
+                {
+                    UserId = user1.Id,
+                    VoteId = 3,
+                },
+                new VoteParticipation
+                {
+                    UserId = user2.Id,
+                    VoteId = 3,
+                }
+            ];
+
+            await context.VoteParticipations.AddRangeAsync(voteParticipations);
         }
         
         await context.SaveChangesAsync();

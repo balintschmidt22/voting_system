@@ -7,10 +7,16 @@ namespace VotingSystem.Shared.Models;
 /// </summary>
 public record UserRequestDto
 {
+    [StringLength(40, ErrorMessage = "First Name is too long")]
+    public required string FirstName { get; init; }
+    
+    [StringLength(40, ErrorMessage = "Last Name is too long")]
+    public required string LastName { get; init; }
+    
     /// <summary>
     /// Name of the person making the reservation
     /// </summary>
-    [StringLength(255, ErrorMessage = "Name is too long")]
+    [StringLength(255, ErrorMessage = "Username is too long")]
     public required string UserName { get; init; }
     
 
@@ -24,5 +30,4 @@ public record UserRequestDto
     /// Password of the person making the reservation
     /// </summary>
     public required string Password { get; init; }
-
 }

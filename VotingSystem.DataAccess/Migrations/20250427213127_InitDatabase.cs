@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace VotingSystem.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class InitUsers : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -187,6 +187,59 @@ namespace VotingSystem.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "AnonymousVotes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VoteId = table.Column<int>(type: "int", nullable: false),
+                    SelectedOption = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AnonymousVotes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AnonymousVotes_Votes_VoteId",
+                        column: x => x.VoteId,
+                        principalTable: "Votes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "VoteParticipations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    VoteId = table.Column<int>(type: "int", nullable: false),
+                    VotedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VoteParticipations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VoteParticipations_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_VoteParticipations_Votes_VoteId",
+                        column: x => x.VoteId,
+                        principalTable: "Votes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnonymousVotes_VoteId",
+                table: "AnonymousVotes",
+                column: "VoteId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -227,6 +280,16 @@ namespace VotingSystem.DataAccess.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_VoteParticipations_UserId",
+                table: "VoteParticipations",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VoteParticipations_VoteId",
+                table: "VoteParticipations",
+                column: "VoteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Votes_UserId",
                 table: "Votes",
                 column: "UserId");
@@ -235,6 +298,9 @@ namespace VotingSystem.DataAccess.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AnonymousVotes");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -251,10 +317,13 @@ namespace VotingSystem.DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Votes");
+                name: "VoteParticipations");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Votes");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

@@ -10,6 +10,7 @@ public class Vote
 
     [ForeignKey("User")]
     public string UserId { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
     
     [MinLength(5)]
     [MaxLength(255)]
@@ -23,9 +24,10 @@ public class Vote
     
     public required DateTime End { get; set; }
     
-    public virtual User User { get; set; } = null!;
+    public virtual ICollection<AnonymousVote> AnonymousVotes { get; set; } = [];
+    public virtual ICollection<VoteParticipation> VoteParticipations { get; set; } = [];
+
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
     
-    public DateTime CreatedAt { get; set; }
-    
-    public DateTime UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
 }

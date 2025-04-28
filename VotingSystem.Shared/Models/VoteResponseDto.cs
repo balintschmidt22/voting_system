@@ -14,6 +14,10 @@ public record VoteResponseDto
     
     public required DateTime End { get; init; }
     
+    public required ICollection<AnonymousVoteResponseDto> AnonymousVotes { get; set; }
+    
+    public required ICollection<VoteParticipationResponseDto> VoteParticipations { get; set; }
+    
     public DateTime CreatedAt { get; init; }
     
     public DateTime UpdatedAt { get; init; }

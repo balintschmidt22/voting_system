@@ -17,7 +17,7 @@ public class VotesService : IVotesService
     {
         var query = _context.Votes
             .Where(m => m.Start <= DateTime.Now && m.End >= DateTime.Now)
-            .OrderByDescending(m => m.End);
+            .OrderBy(m => m.End);
         
         if (count is null)
         {
@@ -51,7 +51,7 @@ public class VotesService : IVotesService
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (vote is null)
-            throw new EntityNotFoundException(nameof(User));
+            throw new EntityNotFoundException(nameof(Vote));
 
         return vote;
     }

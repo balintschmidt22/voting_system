@@ -8,12 +8,13 @@ export function Header() {
     return (
         <Navbar variant="light" bg="light" expand="md">
             <Container>
-                <Navbar.Brand>ELTE Cinema</Navbar.Brand>
+                <Navbar.Brand>Anonymous Voting</Navbar.Brand>
                 <Navbar.Toggle aria-controls="header-navbar-nav" />
                 <Navbar.Collapse id="header-navbar-nav">
                     <Nav className="me-auto">
-                        <HeaderLink to="/" text="Home"/>
-                        <HeaderLink to="/movies" text="Movies"/>
+                        {/*<HeaderLink to="/" text="Home"/>*/}
+                        <HeaderLink to="/" text="Active Polls"/>
+                        <HeaderLink to="/votes/closed" text="Closed Polls"></HeaderLink>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

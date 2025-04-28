@@ -39,6 +39,8 @@ public static class DependencyInjection
         // Services
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<IVotesService, VotesService>();
+        services.AddScoped<IAnonymousVoteService, AnonymousVoteService>();
+        services.AddScoped<IVoteParticipationService, VoteParticipationService>();
 
         return services;
     }

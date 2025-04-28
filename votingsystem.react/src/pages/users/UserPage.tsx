@@ -1,6 +1,6 @@
-import { getuser } from "@/api/client/users-client";
+/*import { getuser } from "@/api/client/users-client";
 import { getFutureScreenings } from "@/api/client/screenings-client";
-import { userResponseDto } from "@/api/models/userResponseDto";
+import { UserResponseDto } from "@/api/models/UserResponseDto";
 import { ScreeningResponseDto } from "@/api/models/ScreeningResponseDto";
 import { ErrorAlert } from "@/components/alerts/ErrorAlert";
 import { Base64Image } from "@/components/Base64Image";
@@ -13,10 +13,10 @@ import { useParams } from "react-router-dom";
  * Shows the details of a user and its future screenings
  * @constructor
  */
-export function UserPage() {
+/*export function UserPage() {
     const params = useParams();
     const userId = params.userId ? parseInt(params.userId) : null;
-    const [user, setuser] = useState<userResponseDto | null>(null);
+    const [user, setuser] = useState<UserResponseDto | null>(null);
     const [screenings, setScreenings] = useState<ScreeningResponseDto[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -83,4 +83,4 @@ export function UserPage() {
             ) : null}
         </>
     );
-}
+}*/

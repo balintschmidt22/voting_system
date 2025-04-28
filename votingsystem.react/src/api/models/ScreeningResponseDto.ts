@@ -1,4 +1,4 @@
-import { MovieResponseDto } from "@/api/models/MovieResponseDto";
+import { MovieResponseDto } from "@/api/models/VoteResponseDto.ts";
 import { RoomResponseDTO } from "@/api/models/RoomResponseDto";
 
 export interface ScreeningResponseDto {

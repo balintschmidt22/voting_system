@@ -1,14 +1,15 @@
-import { getMovies } from "@/api/client/movies-client";
+/*
+import { getVotes } from "@/api/client/votes-client.ts";
 import { UserResponseDto } from "@/api/models/UserResponseDto";
 import { ErrorAlert } from "@/components/alerts/ErrorAlert";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
-import { MoviesGrid } from "@/components/movies/MoviesGrid";
+import { VotesGrid } from "@/components/votes/VotesGrid";
 import { useEffect, useState } from "react";
 
-/**
+/!**
  * Shows all movies
  * @constructor
- */
+ *!/
 export function UsersPage() {
     const [movies, setMovies] = useState<UserResponseDto[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -19,7 +20,7 @@ export function UsersPage() {
             setError(null);
             setIsLoading(true);
             try {
-                const loadedMovies = await getMovies();
+                const loadedMovies = await getVotes();
                 setMovies(loadedMovies);
             } catch (e) {
                 setError(e instanceof Error ? e.message : "Unknown error.");
@@ -43,4 +44,4 @@ export function UsersPage() {
             <MoviesGrid movies={movies} />
         </>
     )
-}
+}*/
