@@ -171,9 +171,6 @@ namespace VotingSystem.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -214,7 +211,7 @@ namespace VotingSystem.DataAccess.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("RefreshToken")
+                    b.Property<Guid>("RefreshToken")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SecurityStamp")

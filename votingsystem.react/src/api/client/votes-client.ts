@@ -16,3 +16,7 @@ export async function getActiveVotes(): Promise<VoteResponseDto[]> {
 export async function getClosedVotes(): Promise<VoteResponseDto[]> {
     return await get<VoteResponseDto[]>(`votes/closed`);
 }
+
+export async function getUserAlreadyVoted(id: number, user: string | undefined): Promise<boolean>{
+    return await get<boolean>(`votes/voted/${id}/${user}`)
+}

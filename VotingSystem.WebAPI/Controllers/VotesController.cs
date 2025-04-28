@@ -76,4 +76,22 @@ public class VotesController : ControllerBase
 
         return Ok(voteResponseDto);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("voted/{id:int}/{user}")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(bool))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetUserAlreadyVoted([FromRoute] int id, string user)
+    {
+        var vote = await _votesService.GetByIdAsync(id);
+        var voted = vote.VoteParticipations.Any(x => x.UserId == user);
+        
+        return Ok(voted);
+    }
 }

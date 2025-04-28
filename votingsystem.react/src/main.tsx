@@ -7,6 +7,11 @@ import { HomePage } from "@/pages/HomePage";
 /*import { UsersPage } from "@/pages/users/UsersPage.tsx";
 import { UserPage } from "@/pages/users/UserPage.tsx";*/
 import { NotFoundPage } from "@/pages/NotFoundPage";
+import { Protected } from './components/Protected';
+import { LoginPage } from './pages/user/LoginPage';
+import {LogoutPage} from "@/pages/user/LogoutPage.tsx";
+import { RegisterPage } from './pages/user/RegisterPage';
+import { UserContextProvider } from './contexts/UserContextProvider';
 
 
 const router = createBrowserRouter([
@@ -15,11 +20,27 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "/",
-                element: <HomePage />
+                element: <Protected><HomePage /></Protected>
+            },
+            {
+                path: "/votes/active",
+                element: <Protected><HomePage /></Protected>
             },
             {
                 path: "/votes/closed",
-                element: <HomePage />
+                element: <Protected><HomePage /></Protected>
+            },
+            {
+                path: "/user/login",
+                element: <LoginPage />,
+            },
+            {
+                path: "/user/logout",
+                element: <Protected><LogoutPage /></Protected>,
+            },
+            {
+                path: "/user/register",
+                element: <RegisterPage />,
             },
 /*            {
                 path: "/users",
@@ -42,5 +63,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById('root')!).render(
-    <RouterProvider router={router} />
+    <UserContextProvider>
+        <RouterProvider router={router} />
+    </UserContextProvider>
 );

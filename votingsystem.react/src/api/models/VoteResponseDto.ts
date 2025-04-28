@@ -1,4 +1,4 @@
-import {UserResponseDto} from "./UserResponseDto.ts";
+import { UserResponseDto } from "./UserResponseDto.ts";
 import { AnonymousVoteResponseDto } from "./AnonymousVoteResponseDto";
 import { VoteParticipationResponseDto } from "./VoteParticipationResponseDto";
 

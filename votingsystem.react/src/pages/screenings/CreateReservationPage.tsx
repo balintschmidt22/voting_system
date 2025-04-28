@@ -1,3 +1,4 @@
+/*
 import Form from "react-bootstrap/Form";
 import { createReservation } from "@/api/client/reservation-client";
 import { getScreeningById, getSeatsForScreening } from "@/api/client/screenings-client";
@@ -17,10 +18,10 @@ import { ServerSideValidationError } from "@/api/errors/ServerSideValidationErro
 import { HttpError } from "@/api/errors/HttpError";
 import { SeatRequestDto } from "@/api/models/SeatRequestDto";
 
-/**
+/!**
  * Shows the create reservation page with a seatmap
  * @constructor
- */
+ *!/
 export function CreateReservationPage() {
     const params = useParams();
     const navigate = useNavigate();
@@ -147,7 +148,7 @@ export function CreateReservationPage() {
                     <h1>Create reservation</h1>
                     <ScreeningCard screening={screening} showMovieDetails/>
                     <h2>Reservation details</h2>
-                    {/* Disable default HTML validation, because we use Yup */}
+                    {/!* Disable default HTML validation, because we use Yup *!/}
                     <Form onSubmit={handleFormSubmit} validated={false}>
                         <Form.Group className="mb-3">
                             <Form.Label htmlFor="name">Name:</Form.Label>
@@ -224,4 +225,4 @@ export function CreateReservationPage() {
             ): null}
         </>
     );
-}
+}*/
