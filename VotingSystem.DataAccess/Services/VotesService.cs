@@ -55,4 +55,26 @@ public class VotesService : IVotesService
 
         return vote;
     }
+
+    public async Task<IReadOnlyCollection<Vote>> GetBySubString(string sub, bool isActive)
+    {
+        IOrderedQueryable<Vote> query;
+        
+        if (isActive)
+        {
+            query = _context.Votes
+                .Where(m => m.Start <= DateTime.Now && m.End >= DateTime.Now && m.Question.Contains(sub))
+                .OrderBy(m => m.End);
+        }
+        else
+        {
+            query = _context.Votes
+                .Where(m => m.End <= DateTime.Now && m.Question.Contains(sub))
+                .OrderByDescending(m => m.End);
+        }
+        
+        
+        return await query
+            .ToListAsync();
+    }
 }

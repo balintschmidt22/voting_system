@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
 
@@ -43,5 +44,25 @@ public class VoteParticipationsController : ControllerBase
 
         return Ok(voteParticipationResponseDto);
     }
-    
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="voteParticipationRequestDto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(VoteParticipationResponseDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> AddNewVoteParticipation(
+        [FromBody] VoteParticipationRequestDto voteParticipationRequestDto)
+    {
+        var vp = _mapper.Map<VoteParticipation>(voteParticipationRequestDto);
+        await _voteParticipationService.AddVoteParticipationAsync(vp);
+
+        var vpResponseDto = _mapper.Map<VoteParticipationResponseDto>(vp);
+        return Created("", vpResponseDto);
+    }
 }

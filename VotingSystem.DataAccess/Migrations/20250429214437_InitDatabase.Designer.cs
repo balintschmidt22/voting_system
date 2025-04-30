@@ -12,7 +12,7 @@ using VotingSystem.DataAccess;
 namespace VotingSystem.DataAccess.Migrations
 {
     [DbContext(typeof(VotingSystemDbContext))]
-    [Migration("20250428200432_InitDatabase")]
+    [Migration("20250429214437_InitDatabase")]
     partial class InitDatabase
     {
         /// <inheritdoc />
@@ -144,7 +144,8 @@ namespace VotingSystem.DataAccess.Migrations
 
                     b.Property<string>("SelectedOption")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime2");

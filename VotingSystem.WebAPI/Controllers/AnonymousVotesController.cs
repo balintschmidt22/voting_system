@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
 
@@ -14,17 +15,21 @@ public class AnonymousVotesController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IAnonymousVoteService _anonymousVoteService;
-    
+    private readonly IVotesService _votesService;
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="mapper"></param>
     /// <param name="anonymousVoteService"></param>
+    /// <param name="votesService"></param>
     public AnonymousVotesController(IMapper mapper, 
-        IAnonymousVoteService anonymousVoteService)
+        IAnonymousVoteService anonymousVoteService,
+        IVotesService votesService)
     {
         _mapper = mapper;
         _anonymousVoteService = anonymousVoteService;
+        _votesService = votesService;
     }
     
     /// <summary>
@@ -59,5 +64,25 @@ public class AnonymousVotesController : ControllerBase
         var anonymousVoteResponseDto = _mapper.Map<AnonymousVoteResponseDto>(anonymousVote);
 
         return Ok(anonymousVoteResponseDto);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="anonymousVoteRequestDto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(VoteParticipationResponseDto))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> AddNewAnonymousVote(
+        [FromBody] AnonymousVoteRequestDto anonymousVoteRequestDto)
+    {
+        //var av = _mapper.Map<AnonymousVote>(anonymousVoteRequestDto);
+        //var vote = await _votesService.GetByIdAsync(anonymousVoteRequestDto.VoteId);
+        await _anonymousVoteService.AddAnonymousVoteAsync(anonymousVoteRequestDto.VoteId, anonymousVoteRequestDto.SelectedOption);
+        return Created();
     }
 }

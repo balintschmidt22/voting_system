@@ -8,5 +8,7 @@ public interface IVotesService
     
     Task<IReadOnlyCollection<Vote>> GetClosedVotesAsync(int? count = null);
     
-    Task<Vote> GetByIdAsync(int id); 
+    Task<Vote> GetByIdAsync(int id);
+
+    Task<IReadOnlyCollection<Vote>> GetBySubString(string sub, bool isActive);
 }

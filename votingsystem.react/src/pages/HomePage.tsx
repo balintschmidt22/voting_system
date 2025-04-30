@@ -1,4 +1,4 @@
-import { getActiveVotes, getClosedVotes } from "@/api/client/votes-client.ts";
+import {getActiveVotes, getClosedVotes, getVoteBySubString} from "@/api/client/votes-client.ts";
 import { VoteResponseDto } from "@/api/models/VoteResponseDto";
 import { ErrorAlert } from "@/components/alerts/ErrorAlert";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
@@ -60,15 +60,60 @@ export function HomePage() {
             <>
                 <h1>Welcome to the Anonymous Voting!</h1>
                 <h2>Active polls ({votes.length})</h2>
+                <div className="input-group mb-4" style={{maxWidth: "400px"}}>
+                  <span className="input-group-text bg-white border-end-0">
+                    🔍
+                  </span>
+                    <input
+                        type="text"
+                        className="form-control border-start-0"
+                        placeholder="Search votes..."
+                        onChange={async (e) => {
+                            const value = e.target.value;
+                            if (value === "") {
+                                // optionally reset to default state (e.g., reload active votes)
+                                setVotes(await getActiveVotes());
+                                return;
+                            }
+                            try {
+                                setVotes(await getVoteBySubString(value, true));
+                            } catch (e) {
+                                // optional error handling
+                            }
+                        }}
+                    />
+                </div>
             </>
             : location.pathname === '/votes/closed' ? 
             <>
                 <h1>Anonymous Voting</h1>
                 <h2>Closed polls ({votes.length})</h2>
+                <div className="input-group mb-4" style={{maxWidth: "400px"}}>
+                  <span className="input-group-text bg-white border-end-0">
+                    🔍
+                  </span>
+                    <input 
+                        type="text"
+                        className="form-control border-start-0"
+                        placeholder="Search votes..."
+                        onChange={async (e) => {
+                            const value = e.target.value;
+                            if (value === "") {
+                                
+                                setVotes(await getClosedVotes());
+                                return;
+                            }
+                            try {
+                                setVotes(await getVoteBySubString(value, false));
+                            } catch (e) {
+                                
+                            }
+                        }}
+                    />
+                </div>  
             </>
             : <></>
         }
-        
         <VotesGrid votes={votes} />
     </>);
 }

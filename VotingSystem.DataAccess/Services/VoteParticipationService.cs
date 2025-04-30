@@ -43,4 +43,28 @@ public class VoteParticipationService : IVoteParticipationService
         return await query
             .ToListAsync();
     }
+    
+    public async Task AddVoteParticipationAsync(VoteParticipation vp)
+    {
+        await CheckIfVoteExistsAsync(vp);
+
+        vp.VotedAt = DateTime.UtcNow;
+        
+        try
+        {
+            await _context.VoteParticipations.AddAsync(vp);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new SaveFailedException("Failed to submit new vote.", ex);
+        }
+    }
+    
+    private async Task CheckIfVoteExistsAsync(VoteParticipation vp)
+    {
+        if (await _context.VoteParticipations.AnyAsync(v => string.Equals(v.UserId, vp.UserId)
+                                                       && v.VoteId == vp.VoteId))
+            throw new InvalidDataException("Vote with same data already exists");
+    }
 }

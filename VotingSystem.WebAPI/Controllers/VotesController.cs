@@ -14,19 +14,19 @@ public class VotesController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IVotesService _votesService;
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="mapper"></param>
     /// <param name="votesService"></param>
-    public VotesController(IMapper mapper, 
+    public VotesController(IMapper mapper,
         IVotesService votesService)
     {
         _mapper = mapper;
         _votesService = votesService;
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -42,7 +42,7 @@ public class VotesController : ControllerBase
 
         return Ok(voteResponseDtos);
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -91,7 +91,30 @@ public class VotesController : ControllerBase
     {
         var vote = await _votesService.GetByIdAsync(id);
         var voted = vote.VoteParticipations.Any(x => x.UserId == user);
-        
+
         return Ok(voted);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="body"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("search")]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(List<VoteResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> GetVoteBySubString(
+        [FromBody] SearchRequestDto body)
+    {
+        if (string.IsNullOrWhiteSpace(body.Sub))
+            return BadRequest("Search term cannot be empty.");
+        
+        var votes = await _votesService.GetBySubString(body.Sub, body.IsActive);
+
+        return Ok(votes);
     }
 }

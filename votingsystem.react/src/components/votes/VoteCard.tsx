@@ -19,6 +19,7 @@ export function VoteCard({ vote }: Props) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [voted, setVoted] = useState<boolean>(false);
+    const [isActive, setIsActive] = useState<boolean>(false);
 
     useEffect(() => {
         async function loadContent() {
@@ -31,6 +32,9 @@ export function VoteCard({ vote }: Props) {
             try {
                 setVoted(
                     await getUserAlreadyVoted(vote.id, userContext.userId)
+                );
+                setIsActive(
+                    new Date(vote.start) <= new Date() && new Date(vote.end) >= new Date()
                 );
             } catch (e) {
                 setError(e instanceof Error ? e.message : "Unknown error.");
@@ -57,11 +61,21 @@ export function VoteCard({ vote }: Props) {
                             {
                                 voted
                                     ?
-                                    <Link className="stretched-link text-success text-underline-hover"
-                                          to={`/votes/${vote.id}`}>{vote.question}</Link>
+                                    isActive 
+                                        ?
+                                        <Link className="stretched-link text-success text-underline-hover"
+                                              to={`/votes/active/${vote.id}`}>{vote.question}</Link>
+                                        :
+                                        <Link className="stretched-link text-success text-underline-hover"
+                                              to={`/votes/closed/${vote.id}`}>{vote.question}</Link>
                                     :
-                                    <Link className="stretched-link text-danger text-underline-hover"
-                                          to={`/votes/${vote.id}`}>{vote.question}</Link>
+                                    isActive
+                                        ?
+                                        <Link className="stretched-link text-danger text-underline-hover"
+                                              to={`/votes/active/${vote.id}`}>{vote.question}</Link>
+                                        :
+                                        <Link className="stretched-link text-danger text-underline-hover"
+                                              to={`/votes/closed/${vote.id}`}>{vote.question}</Link>
                             }
                         </h5>
                         <h6 className="card-footer bg-light-subtle">

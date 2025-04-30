@@ -1,5 +1,8 @@
-import { get } from "@/api/client/http";
+import { get, postAsJson, postAsJsonWithoutResponse } from "@/api/client/http";
 import { VoteResponseDto } from "../models/VoteResponseDto";
+import { AnonymousVoteRequestDto } from "../models/AnonymousVoteRequestDto";
+import { VoteParticipationRequestDto } from "../models/VoteParticipationRequestDto";
+import { VoteParticipationResponseDto } from "../models/VoteParticipationResponseDto";
 
 export async function getVotes(count?: number): Promise<VoteResponseDto[]> {
     return await get<VoteResponseDto[]>("votes", count ? { count: count.toString() } : undefined);
@@ -19,4 +22,18 @@ export async function getClosedVotes(): Promise<VoteResponseDto[]> {
 
 export async function getUserAlreadyVoted(id: number, user: string | undefined): Promise<boolean>{
     return await get<boolean>(`votes/voted/${id}/${user}`)
+}
+
+export async function addVoteParticipation(body: VoteParticipationRequestDto): Promise<VoteParticipationResponseDto> {
+    return await postAsJson<VoteParticipationRequestDto, VoteParticipationResponseDto>("voteparticipations", body);
+}
+export async function addAnonymousVote(body: AnonymousVoteRequestDto): Promise<void> {
+    await postAsJsonWithoutResponse<AnonymousVoteRequestDto>("anonymousvotes", body);
+}
+
+export async function getVoteBySubString(sub: string, isActive: boolean): Promise<VoteResponseDto[]> {
+    return await postAsJson<{ sub: string; isActive: boolean }, VoteResponseDto[]>("votes/search", {
+        sub,
+        isActive,
+    });
 }

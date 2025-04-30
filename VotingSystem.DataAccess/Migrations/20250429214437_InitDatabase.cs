@@ -193,7 +193,7 @@ namespace VotingSystem.DataAccess.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     VoteId = table.Column<int>(type: "int", nullable: false),
-                    SelectedOption = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SelectedOption = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>

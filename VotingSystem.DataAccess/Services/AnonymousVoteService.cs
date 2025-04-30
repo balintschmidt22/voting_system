@@ -43,4 +43,31 @@ public class AnonymousVoteService : IAnonymousVoteService
         return await query
             .ToListAsync();
     }
+    
+    public async Task AddAnonymousVoteAsync(int voteId, string option)
+    {
+        var av = new AnonymousVote();
+        
+        await CheckIfOptionExistsAsync(voteId, option);
+
+        av.VoteId = voteId;
+        av.SelectedOption = option;
+        av.SubmittedAt = DateTime.UtcNow;
+        
+        try
+        {
+            await _context.AnonymousVotes.AddAsync(av);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new SaveFailedException("Failed to submit new vote.", ex);
+        }
+    }
+    
+    private async Task CheckIfOptionExistsAsync(int id, string option)
+    {
+        if (await _context.Votes.AnyAsync(v => v.Id == id && !v.Options.Contains(option)))
+            throw new InvalidDataException("Vote does not have this option!");
+    }
 }
