@@ -1,16 +1,16 @@
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { useUserContext } from "@/contexts/UserContext";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 export function LogoutPage() {
-    const userContext = useUserContext();
-    const navigate = useNavigate();
+    const { handleLogout } = useUserContext();
 
     useEffect(() => {
-        userContext.handleLogout()
-            .then(() => navigate("/"));
-    }, [userContext, navigate]);
-    
+        handleLogout().then(() => {
+            // Force full reload of the app at login page
+            window.location.href = "/";
+        });
+    }, [handleLogout]);
+
     return <LoadingIndicator />;
 }

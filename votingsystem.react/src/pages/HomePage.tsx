@@ -1,4 +1,4 @@
-import {getActiveVotes, getClosedVotes, getVoteBySubString} from "@/api/client/votes-client.ts";
+import {getActiveVotes, getClosedVotes, getVoteBySubString, getVotesByDateInterval} from "@/api/client/votes-client.ts";
 import { VoteResponseDto } from "@/api/models/VoteResponseDto";
 import { ErrorAlert } from "@/components/alerts/ErrorAlert";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
@@ -17,6 +17,8 @@ export function HomePage() {
     const [votes, setVotes] = useState<VoteResponseDto[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
     useEffect(() => {
         async function loadContent() {
@@ -60,7 +62,7 @@ export function HomePage() {
             <>
                 <h1>Welcome to the Anonymous Voting!</h1>
                 <h2>Active polls ({votes.length})</h2>
-                <div className="input-group mb-4" style={{maxWidth: "400px"}}>
+                <div className="input-group mb-4" style={{maxWidth: "450px"}}>
                   <span className="input-group-text bg-white border-end-0">
                     🔍
                   </span>
@@ -71,24 +73,53 @@ export function HomePage() {
                         onChange={async (e) => {
                             const value = e.target.value;
                             if (value === "") {
-                                // optionally reset to default state (e.g., reload active votes)
                                 setVotes(await getActiveVotes());
                                 return;
                             }
                             try {
                                 setVotes(await getVoteBySubString(value, true));
                             } catch (e) {
-                                // optional error handling
+                                //
                             }
                         }}
                     />
                 </div>
+                <div className="input-group mb-4" style={{ maxWidth: "450px" }}>
+                    <span className="input-group-text bg-white">📅</span>
+                    <input
+                        type="date"
+                        className="form-control"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <input
+                        type="date"
+                        className="form-control"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={async () => {
+                            try {
+                                if (!startDate || !endDate) return;
+                                const votes = await getVotesByDateInterval(startDate, endDate, true);
+                                setVotes(votes);
+                            } catch (e) {
+                                //
+                            }
+                        }}
+                    >
+                        Search
+                    </button>
+                </div>
+
             </>
             : location.pathname === '/votes/closed' ? 
             <>
                 <h1>Anonymous Voting</h1>
                 <h2>Closed polls ({votes.length})</h2>
-                <div className="input-group mb-4" style={{maxWidth: "400px"}}>
+                <div className="input-group mb-4" style={{maxWidth: "450px"}}>
                   <span className="input-group-text bg-white border-end-0">
                     🔍
                   </span>
@@ -110,7 +141,36 @@ export function HomePage() {
                             }
                         }}
                     />
-                </div>  
+                </div>
+                <div className="input-group mb-4" style={{ maxWidth: "450px" }}>
+                    <span className="input-group-text bg-white">📅</span>
+                    <input
+                        type="date"
+                        className="form-control"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                    />
+                    <input
+                        type="date"
+                        className="form-control"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                    />
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={async () => {
+                            try {
+                                if (!startDate || !endDate) return;
+                                const votes = await getVotesByDateInterval(startDate, endDate, false);
+                                setVotes(votes);
+                            } catch (e) {
+                                //
+                            }
+                        }}
+                    >
+                        Search
+                    </button>
+                </div>
             </>
             : <></>
         }

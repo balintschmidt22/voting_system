@@ -2,7 +2,6 @@ import { get, postAsJson, postAsJsonWithoutResponse } from "@/api/client/http";
 import { VoteResponseDto } from "../models/VoteResponseDto";
 import { AnonymousVoteRequestDto } from "../models/AnonymousVoteRequestDto";
 import { VoteParticipationRequestDto } from "../models/VoteParticipationRequestDto";
-import { VoteParticipationResponseDto } from "../models/VoteParticipationResponseDto";
 
 export async function getVotes(count?: number): Promise<VoteResponseDto[]> {
     return await get<VoteResponseDto[]>("votes", count ? { count: count.toString() } : undefined);
@@ -24,8 +23,8 @@ export async function getUserAlreadyVoted(id: number, user: string | undefined):
     return await get<boolean>(`votes/voted/${id}/${user}`)
 }
 
-export async function addVoteParticipation(body: VoteParticipationRequestDto): Promise<VoteParticipationResponseDto> {
-    return await postAsJson<VoteParticipationRequestDto, VoteParticipationResponseDto>("voteparticipations", body);
+export async function addVoteParticipation(body: VoteParticipationRequestDto): Promise<void> {
+    await postAsJsonWithoutResponse<VoteParticipationRequestDto>("voteparticipations", body);
 }
 export async function addAnonymousVote(body: AnonymousVoteRequestDto): Promise<void> {
     await postAsJsonWithoutResponse<AnonymousVoteRequestDto>("anonymousvotes", body);
@@ -36,4 +35,22 @@ export async function getVoteBySubString(sub: string, isActive: boolean): Promis
         sub,
         isActive,
     });
+}
+
+export async function getVotesByDateInterval(start: string, end: string, isActive: boolean): Promise<VoteResponseDto[]> {
+    return await postAsJson<{ start: string; end: string; isActive: boolean}, VoteResponseDto[]>("/votes/search-by-date", {
+        start,
+        end,
+        isActive,
+    });
+}
+
+
+export async function getVoteResults(voteId: number): Promise<{ [option: string]: number }> {
+    const response = await fetch(`/api/votes/${voteId}/results`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch vote results");
+    }
+    const data = await response.json();
+    return data.results;
 }

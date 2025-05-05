@@ -46,14 +46,16 @@ public class AnonymousVoteService : IAnonymousVoteService
     
     public async Task AddAnonymousVoteAsync(int voteId, string option)
     {
-        var av = new AnonymousVote();
-        
         await CheckIfOptionExistsAsync(voteId, option);
+        await CheckIfVoteIsClosed(voteId);
 
-        av.VoteId = voteId;
-        av.SelectedOption = option;
-        av.SubmittedAt = DateTime.UtcNow;
-        
+        var av = new AnonymousVote
+        {
+            VoteId = voteId,
+            SelectedOption = option,
+            SubmittedAt = DateTime.Now
+        };
+
         try
         {
             await _context.AnonymousVotes.AddAsync(av);
@@ -70,4 +72,22 @@ public class AnonymousVoteService : IAnonymousVoteService
         if (await _context.Votes.AnyAsync(v => v.Id == id && !v.Options.Contains(option)))
             throw new InvalidDataException("Vote does not have this option!");
     }
+    
+    private async Task CheckIfVoteIsClosed(int voteId)
+    {
+        if (await _context.Votes.AnyAsync(v => v.Id == voteId && v.End <= DateTime.Now))
+            throw new InvalidDataException("Vote is closed!");
+    }
+    
+    public async Task<Dictionary<string, int>> GetVoteResultsAsync(int voteId)
+    {
+        var votes = await _context.AnonymousVotes
+            .Where(v => v.VoteId == voteId)
+            .ToListAsync();
+
+        return votes
+            .GroupBy(v => v.SelectedOption)
+            .ToDictionary(g => g.Key, g => g.Count());
+    }
+
 }

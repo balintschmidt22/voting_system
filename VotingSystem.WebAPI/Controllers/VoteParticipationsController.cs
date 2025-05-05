@@ -59,10 +59,8 @@ public class VoteParticipationsController : ControllerBase
     public async Task<IActionResult> AddNewVoteParticipation(
         [FromBody] VoteParticipationRequestDto voteParticipationRequestDto)
     {
-        var vp = _mapper.Map<VoteParticipation>(voteParticipationRequestDto);
-        await _voteParticipationService.AddVoteParticipationAsync(vp);
+        await _voteParticipationService.AddVoteParticipationAsync(voteParticipationRequestDto.UserId, voteParticipationRequestDto.VoteId);
 
-        var vpResponseDto = _mapper.Map<VoteParticipationResponseDto>(vp);
-        return Created("", vpResponseDto);
+        return Created();
     }
 }

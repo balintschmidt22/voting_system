@@ -77,4 +77,28 @@ public class VotesService : IVotesService
         return await query
             .ToListAsync();
     }
+    
+    public async Task<IReadOnlyCollection<Vote>> GetByDate(DateTime start, DateTime end, bool isActive)
+    {
+        IOrderedQueryable<Vote> query;
+        
+        if (isActive)
+        {
+            var votes = await GetActiveVotesAsync();
+            query = _context.Votes
+                .Where(m => m.Start >= start && m.End <= end && votes.Contains(m))
+                .OrderBy(m => m.End);
+        }
+        else
+        {
+            var votes = await GetClosedVotesAsync();
+            query = _context.Votes
+                .Where(m => m.Start >= start && m.End <= end && votes.Contains(m))
+                .OrderByDescending(m => m.End);
+        }
+        
+        
+        return await query
+            .ToListAsync();
+    }
 }

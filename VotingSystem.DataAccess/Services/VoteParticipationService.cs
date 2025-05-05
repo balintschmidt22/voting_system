@@ -44,11 +44,17 @@ public class VoteParticipationService : IVoteParticipationService
             .ToListAsync();
     }
     
-    public async Task AddVoteParticipationAsync(VoteParticipation vp)
+    public async Task AddVoteParticipationAsync(string userId, int voteId)
     {
-        await CheckIfVoteExistsAsync(vp);
-
-        vp.VotedAt = DateTime.UtcNow;
+        await CheckIfVoteExistsAsync(userId, voteId);
+        await CheckIfVoteIsClosed(voteId);
+        
+        var vp = new VoteParticipation
+        {
+            UserId = userId,
+            VoteId = voteId,
+            VotedAt = DateTime.Now
+        };
         
         try
         {
@@ -61,10 +67,16 @@ public class VoteParticipationService : IVoteParticipationService
         }
     }
     
-    private async Task CheckIfVoteExistsAsync(VoteParticipation vp)
+    private async Task CheckIfVoteExistsAsync(string userId, int voteId)
     {
-        if (await _context.VoteParticipations.AnyAsync(v => string.Equals(v.UserId, vp.UserId)
-                                                       && v.VoteId == vp.VoteId))
-            throw new InvalidDataException("Vote with same data already exists");
+        if (await _context.VoteParticipations.AnyAsync(v => string.Equals(v.UserId, userId)
+                                                       && v.VoteId == voteId))
+            throw new InvalidDataException("Already voted!");
+    }
+    
+    private async Task CheckIfVoteIsClosed(int voteId)
+    {
+        if (await _context.Votes.AnyAsync(v => v.Id == voteId && v.End <= DateTime.Now))
+            throw new InvalidDataException("Vote is closed!");
     }
 }

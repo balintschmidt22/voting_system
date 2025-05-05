@@ -12,6 +12,7 @@ import { RegisterPage } from './pages/user/RegisterPage';
 import { UserContextProvider } from './contexts/UserContextProvider';
 import { VotePageActive } from './pages/votes/VotePageActive.tsx';
 import { VotePageClosed } from './pages/votes/VotePageClosed.tsx';
+import { VoteSuccessPage } from './pages/votes/VoteSuccessPage.tsx';
 
 
 const router = createBrowserRouter([
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
             {
                 path: "/user/register",
                 element: <RegisterPage />,
+            },
+            {
+                path: "/thank-you",
+                element: <Protected><VoteSuccessPage /></Protected>
             },
 /*            {
                 path: "/screenings/:screeningId/create-reservation",

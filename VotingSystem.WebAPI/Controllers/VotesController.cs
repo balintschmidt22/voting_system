@@ -14,17 +14,21 @@ public class VotesController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IVotesService _votesService;
+    private readonly IAnonymousVoteService _anonymousVotesService;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="mapper"></param>
     /// <param name="votesService"></param>
+    /// <param name="anonymousVotesService"></param>
     public VotesController(IMapper mapper,
-        IVotesService votesService)
+        IVotesService votesService,
+        IAnonymousVoteService anonymousVotesService)
     {
         _mapper = mapper;
         _votesService = votesService;
+        _anonymousVotesService = anonymousVotesService;
     }
 
     /// <summary>
@@ -117,4 +121,47 @@ public class VotesController : ControllerBase
 
         return Ok(votes);
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="body"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("search-by-date")]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(List<VoteResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> GetVoteByDate(
+        [FromBody] SearchDateRequestDto body)
+    {
+        var votes = await _votesService.GetByDate(body.Start, body.End, body.IsActive);
+
+        return Ok(votes);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("{id}/results")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(bool))]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetVoteResults(int id)
+    {
+        var vote = await _votesService.GetByIdAsync(id);
+        
+        if (vote.End > DateTime.UtcNow)
+        {
+            return BadRequest("Voting is still open. Results are not available yet.");
+        }
+
+        var results = await _anonymousVotesService.GetVoteResultsAsync(id);
+        return Ok(new { results });
+    }
+
 }

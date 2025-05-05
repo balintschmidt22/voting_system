@@ -54,7 +54,6 @@ export function VoteCard({ vote }: Props) {
             {error ? <ErrorAlert message={error} /> : null}
             <Col>
                 <Card className="h-100 bg-light-subtle border-dark-subtle">
-                    {/*<Base64CardImage data={movie.image} alt={movie.title} variant="top" />*/}
                     <Card.Body>
                         <h5 className="card-title">#{vote.id})</h5>
                         <h5 className="card-body">
@@ -64,10 +63,10 @@ export function VoteCard({ vote }: Props) {
                                     isActive 
                                         ?
                                         <Link className="stretched-link text-success text-underline-hover"
-                                              to={`/votes/active/${vote.id}`}>{vote.question}</Link>
+                                              to={`/votes/active/${vote.id}`}>{vote.question}✅</Link>
                                         :
                                         <Link className="stretched-link text-success text-underline-hover"
-                                              to={`/votes/closed/${vote.id}`}>{vote.question}</Link>
+                                              to={`/votes/closed/${vote.id}`}>{vote.question}✅</Link>
                                     :
                                     isActive
                                         ?

@@ -15,5 +15,5 @@ public class AnonymousVote
     [MaxLength(1000)]
     public string SelectedOption { get; set; } = null!;
 
-    public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+    public DateTime SubmittedAt { get; set; } = DateTime.Now;
 }

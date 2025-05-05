@@ -2,7 +2,7 @@
 
 public record VoteParticipationRequestDto
 {
-    public required UserResponseDto User { get; set; }
+    public required string UserId { get; set; }
 
-    public required VoteResponseDto Vote { get; set; }
+    public required int VoteId { get; set; }
 }

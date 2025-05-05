@@ -72,7 +72,7 @@ public class AnonymousVotesController : ControllerBase
     /// <param name="anonymousVoteRequestDto"></param>
     /// <returns></returns>
     [HttpPost]
-    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(VoteParticipationResponseDto))]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(AnonymousVoteResponseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -80,8 +80,6 @@ public class AnonymousVotesController : ControllerBase
     public async Task<IActionResult> AddNewAnonymousVote(
         [FromBody] AnonymousVoteRequestDto anonymousVoteRequestDto)
     {
-        //var av = _mapper.Map<AnonymousVote>(anonymousVoteRequestDto);
-        //var vote = await _votesService.GetByIdAsync(anonymousVoteRequestDto.VoteId);
         await _anonymousVoteService.AddAnonymousVoteAsync(anonymousVoteRequestDto.VoteId, anonymousVoteRequestDto.SelectedOption);
         return Created();
     }

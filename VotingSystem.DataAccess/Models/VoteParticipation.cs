@@ -16,5 +16,5 @@ public class VoteParticipation
     public int VoteId { get; set; }
     public virtual Vote Vote { get; set; } = null!;
 
-    public DateTime VotedAt { get; set; } = DateTime.UtcNow;
+    public DateTime VotedAt { get; set; } = DateTime.Now;
 }

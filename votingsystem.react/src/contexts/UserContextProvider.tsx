@@ -51,7 +51,7 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
             return;
         }
         await logout();
-        localStorage.removeItem("user");
+        localStorage.clear();
         setUser(null);
     }, [loggedIn]);
 
