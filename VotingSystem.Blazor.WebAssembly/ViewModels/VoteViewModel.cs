@@ -6,8 +6,7 @@ namespace VotingSystem.Blazor.WebAssembly.ViewModels;
 
 public class VoteViewModel
 {
-    //required
-    public UserResponseDto? User { get; set; }
+    public string? UserId { get; set; }
     
     [Required(ErrorMessage = "Question shouldn't be empty")]
     [MinLength(5, ErrorMessage = "Question is too short")]
@@ -15,7 +14,7 @@ public class VoteViewModel
     public string? Question { get; set; }
     
     [Required(ErrorMessage = "Options shouldn't be empty")]
-    [MinLength(5, ErrorMessage = "Enter at least two options separated by ';'")]
+    [MinLength(3, ErrorMessage = "Enter at least two options separated by ';'")]
     [MaxLength(5000, ErrorMessage = "Too much text")]
     public string OptionsRaw { get; set; } = string.Empty;
 
@@ -25,12 +24,12 @@ public class VoteViewModel
                                ?? Array.Empty<string>();
 
 
-    [Required(ErrorMessage = "Start shouldn't be empty")]
-    [CustomValidation(typeof(VoteViewModel), nameof(ValidateStart))]
+    //[Required(ErrorMessage = "Start shouldn't be empty")]
+    //[CustomValidation(typeof(VoteViewModel), nameof(ValidateStart))]
     public DateTime? Start { get; set; }
     
-    [Required(ErrorMessage = "End shouldn't be empty")]
-    [CustomValidation(typeof(VoteViewModel), nameof(ValidateEnd))]
+    //[Required(ErrorMessage = "End shouldn't be empty")]
+    //[CustomValidation(typeof(VoteViewModel), nameof(ValidateEnd))]
     public DateTime? End { get; set; }
     
     public static ValidationResult? ValidateStart(DateTime date, ValidationContext context)
@@ -48,11 +47,4 @@ public class VoteViewModel
     }
     
     //end > start + 15
-
-    /*public static ValidationResult? ValidateUserId(int id, ValidationContext context)
-    {
-        return (id > 0)
-            ? ValidationResult.Success
-            : new ValidationResult("Please select a room.", new[] { nameof(ScreeningViewModel.Room) });
-    }*/
 }

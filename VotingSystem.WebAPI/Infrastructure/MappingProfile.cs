@@ -18,7 +18,9 @@ public class MappingProfile: Profile
             .ForSourceMember(src => src.Password, opt => opt.DoNotValidate());
 
         CreateMap<User, UserResponseDto>(MemberList.Destination);
-        
+
+        CreateMap<VoteRequestDto, Vote>(MemberList.None);
+                   
         CreateMap<Vote, VoteResponseDto>(MemberList.Destination);
         
         CreateMap<VoteParticipation, VoteParticipationResponseDto>(MemberList.Destination);

@@ -51,6 +51,7 @@ namespace VotingSystem.Blazor.WebAssembly.Services
                 await _localStorageService.SetItemAsStringAsync("AuthToken", responseBody.AuthToken);
                 await _localStorageService.SetItemAsStringAsync("RefreshToken", responseBody.RefreshToken);
                 await SetCurrentUserNameAsync(responseBody.UserId);
+                await _localStorageService.SetItemAsStringAsync("Id", responseBody.UserId);
 
                 return true;
             }

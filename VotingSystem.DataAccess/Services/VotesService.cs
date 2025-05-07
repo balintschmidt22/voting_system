@@ -13,6 +13,21 @@ public class VotesService : IVotesService
         _context = context;
     }
     
+    public async Task AddAsync(Vote vote)
+    {
+        await CheckIfQuestionExistsAsync(vote);
+
+        try
+        {
+            await _context.Votes.AddAsync(vote);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new SaveFailedException("Failed to create vote.", ex);
+        }
+    }
+    
     public async Task<IReadOnlyCollection<Vote>> GetActiveVotesAsync(int? count = null)
     {
         var query = _context.Votes
@@ -100,5 +115,12 @@ public class VotesService : IVotesService
         
         return await query
             .ToListAsync();
+    }
+    
+    private async Task CheckIfQuestionExistsAsync(Vote vote)
+    {
+        if (await _context.Votes.AnyAsync(m => m.Id != vote.Id
+                                                && m.Question.ToLower().Equals(vote.Question.ToLower())))
+            throw new InvalidDataException("Vote with the same question already exists");
     }
 }

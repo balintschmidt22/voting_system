@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
 
@@ -29,6 +30,26 @@ public class VotesController : ControllerBase
         _mapper = mapper;
         _votesService = votesService;
         _anonymousVotesService = anonymousVotesService;
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="voteRequestDto"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(VoteResponseDto))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> CreateVote([FromBody] VoteRequestDto voteRequestDto)
+    {
+        var vote = _mapper.Map<Vote>(voteRequestDto);
+        await _votesService.AddAsync(vote);
+
+        var voteResponseDto = _mapper.Map<VoteResponseDto>(vote);
+        return CreatedAtAction(nameof(CreateVote), new { id = voteResponseDto.Id }, voteResponseDto);
     }
 
     /// <summary>

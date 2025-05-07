@@ -1,11 +1,13 @@
 @page "/votes/add"
+@using System.Text.Json
 @using VotingSystem.Blazor.WebAssembly.Config
 @using VotingSystem.Blazor.WebAssembly.Services
 @using VotingSystem.Blazor.WebAssembly.ViewModels
+@using VotingSystem.Shared.Models
 @inject NavigationManager NavigationManager
 @inject IVoteService VoteService
 @inject AppConfig AppConfig
-
+@inject IJSRuntime JsRuntime
 
 <h1>Create new Vote</h1>
 
@@ -26,13 +28,13 @@
 
     <div class="mb-3">
         <label for="start" class="form-label">Start:</label>
-        <InputDate id="start" @bind-Value="_vote.Start" class="form-control" />
+        <InputText id="start" @bind-Value="_startInput" class="form-control" type="datetime-local" />
         <ValidationMessage For="@(() => _vote.Start)" class="text-danger" />
     </div>
 
     <div class="mb-3">
         <label for="end" class="form-label">End:</label>
-        <InputDate id="end" @bind-Value="_vote.End" class="form-control" />
+        <InputText id="end" @bind-Value="_endInput" class="form-control" type="datetime-local" />
         <ValidationMessage For="@(() => _vote.End)" class="text-danger" />
     </div>
 
@@ -41,15 +43,40 @@
 
 
 @code {
-    private readonly VoteViewModel _vote = new();
+    private string? _startInput;
+    private string? _endInput;
+    private VoteViewModel _vote = new();
 
     private async Task SaveVoteAsync()
     {
+        var id = await JsRuntime.InvokeAsync<string>("localStorage.getItem", ["Id"]);
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            try
+            {   
+                _vote.UserId = id;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Failed to read user: {ex.Message}");
+            }
+        }
+        
+        if (!DateTime.TryParse(_startInput, out var parsedStart) ||
+            !DateTime.TryParse(_endInput, out var parsedEnd))
+        {
+            // Optionally show error messages
+            return;
+        }
+
+        _vote.Start = parsedStart;
+        _vote.End = parsedEnd;
+        
         if (_vote.Options.Length < 2)
         {
             return;
         }
         await VoteService.CreateVoteAsync(_vote);
-        NavigationManager.NavigateTo("/votes");
+        NavigationManager.NavigateTo("/");
     }
 }

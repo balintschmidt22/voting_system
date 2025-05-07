@@ -14,9 +14,10 @@ namespace VotingSystem.Blazor.WebAssembly.Infrastructure
                 .ForMember(dest => dest.Question, opt => opt.MapFrom(src => src.Question))
                 .ForMember(dest => dest.Start, opt => opt.MapFrom(src => src.Start))
                 .ForMember(dest => dest.End, opt => opt.MapFrom(src => src.End))
-                .ForMember(dest => dest.User, opt => opt.Ignore());
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id));
 
             CreateMap<VoteViewModel, VoteRequestDto>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Question, opt => opt.MapFrom(src => src.Question))
                 .ForMember(dest => dest.Options, opt => opt.MapFrom(src => src.Options))
                 .ForMember(dest => dest.Start, opt => opt.MapFrom(src => src.Start!.Value))

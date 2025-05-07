@@ -4,7 +4,7 @@ namespace VotingSystem.Shared.Models;
 
 public record VoteRequestDto
 {
-    public required UserResponseDto User { get; init; }
+    public required string UserId { get; init; }
     
     [MinLength(5)]
     [MaxLength(255)]
@@ -18,7 +18,7 @@ public record VoteRequestDto
     
     public required DateTime End { get; init; }
     
-    public required ICollection<AnonymousVoteResponseDto> AnonymousVotes { get; set; }
+    public ICollection<AnonymousVoteResponseDto>? AnonymousVotes { get; set; }
     
-    public required ICollection<VoteParticipationResponseDto> VoteParticipations { get; set; }
+    public ICollection<VoteParticipationResponseDto>? VoteParticipations { get; set; }
 }
