@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using AutoMapper;
-using ELTE.Cinema.Shared.Models;
-using Microsoft.AspNetCore.Authorization;
-using VotingSystem.DataAccess.Exceptions;
-using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
+using VotingSystem.DataAccess.Services;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.DataAccess.Models;
 

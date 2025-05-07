@@ -26,7 +26,6 @@ builder.Services.AddControllers(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -91,6 +90,19 @@ builder.Services.AddAutomapper();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionToProblemDetailsHandler>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BlazorPolicy",
+        policy =>
+        {
+            policy.WithOrigins(builder.Configuration["BlazorUrl"]
+                               ?? throw new ArgumentNullException("BlazorUrl", "Must set BlazorUrl in appsettings!")) // Enable Blazor port
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -100,6 +112,8 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    app.UseCors("BlazorPolicy");
 }
 
 // Configure the HTTP request pipeline.

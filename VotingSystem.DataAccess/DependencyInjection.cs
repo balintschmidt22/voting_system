@@ -25,8 +25,11 @@ public static class DependencyInjection
         services.AddIdentity<User, UserRole>(options =>
             {
                 // Password settings.
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
                 options.Password.RequiredLength = 6;
-
+                
                 // Lockout settings.
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                 options.Lockout.MaxFailedAccessAttempts = 5;

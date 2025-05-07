@@ -1,4 +1,4 @@
-namespace ELTE.Cinema.Shared.Models;
+namespace VotingSystem.Shared.Models;
 
 /// <summary>
 /// LoginResponseDTO
