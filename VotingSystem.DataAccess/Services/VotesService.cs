@@ -27,6 +27,15 @@ public class VotesService : IVotesService
             throw new SaveFailedException("Failed to create vote.", ex);
         }
     }
+
+    public async Task<IReadOnlyCollection<Vote>> GetMyVotesAsync(string? id)
+    {
+        var query = _context.Votes
+            .Where(m => string.Equals(m.UserId, id))
+            .OrderBy(m => m.End);
+        
+        return await query.ToListAsync();
+    }
     
     public async Task<IReadOnlyCollection<Vote>> GetActiveVotesAsync(int? count = null)
     {

@@ -161,4 +161,9 @@ internal class UsersService : IUsersService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+    public async Task<List<User>> GetAllUsersAsync()
+    {
+        return await _userManager.Users.ToListAsync();
+    }
 }

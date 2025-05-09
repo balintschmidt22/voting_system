@@ -6,6 +6,7 @@ namespace VotingSystem.Blazor.WebAssembly.ViewModels;
 
 public class VoteViewModel
 {
+    public int? Id { get; set; }
     public string? UserId { get; set; }
     
     [Required(ErrorMessage = "Question shouldn't be empty")]
@@ -31,6 +32,8 @@ public class VoteViewModel
     //[Required(ErrorMessage = "End shouldn't be empty")]
     //[CustomValidation(typeof(VoteViewModel), nameof(ValidateEnd))]
     public DateTime? End { get; set; }
+    
+    public ICollection<VoteParticipationResponseDto>? VoteParticipations { get; set; }
     
     public static ValidationResult? ValidateStart(DateTime date, ValidationContext context)
     {

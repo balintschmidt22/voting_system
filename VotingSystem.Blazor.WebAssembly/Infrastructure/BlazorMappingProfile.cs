@@ -25,6 +25,8 @@ namespace VotingSystem.Blazor.WebAssembly.Infrastructure
                 .ForMember(dest => dest.AnonymousVotes, opt => opt.Ignore())
                 .ForMember(dest => dest.VoteParticipations, opt => opt.Ignore());
 
+            CreateMap<UserResponseDto, UserViewModel>();
+            
             CreateMap<LoginViewModel, LoginRequestDto>(MemberList.Source);
         }
 

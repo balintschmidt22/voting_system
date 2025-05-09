@@ -117,6 +117,24 @@ public class UsersController : ControllerBase
     }
     
     /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Authorize]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<UserResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var users = await _usersService.GetAllUsersAsync();
+        var userResponseDto = _mapper.Map<List<UserResponseDto>>(users);
+
+        return Ok(userResponseDto);
+    }
+    
+    /// <summary>
     /// Get user by ID
     /// </summary>
     /// <param name="id"></param>

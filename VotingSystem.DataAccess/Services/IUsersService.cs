@@ -13,4 +13,5 @@ public interface IUsersService
     Task<User> GetUserByIdAsync(string id);
     List<Role> GetCurrentUserRoles();
     bool IsCurrentUserAdmin();
+    Task<List<User>> GetAllUsersAsync();
 }

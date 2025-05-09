@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
@@ -50,6 +51,23 @@ public class VotesController : ControllerBase
 
         var voteResponseDto = _mapper.Map<VoteResponseDto>(vote);
         return CreatedAtAction(nameof(CreateVote), new { id = voteResponseDto.Id }, voteResponseDto);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [Route("my")]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
+    public async Task<IActionResult> GetMyVotes()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+        var votes = await _votesService.GetMyVotesAsync("2a549ec8-85a6-426a-9e0c-d5d795608951");
+        var voteResponseDtos = _mapper.Map<List<VoteResponseDto>>(votes);
+
+        return Ok(voteResponseDtos);
     }
 
     /// <summary>

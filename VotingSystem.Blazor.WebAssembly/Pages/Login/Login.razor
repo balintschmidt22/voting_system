@@ -63,7 +63,7 @@
         var success = await AuthenticationService.TryAutoLoginAsync();
         if (success)
         {
-            NavigationManager.NavigateTo("/votes/add");
+            NavigationManager.NavigateTo("/votes");
         }
         else
         {
@@ -77,7 +77,7 @@
         var success = await AuthenticationService.LoginAsync(LoginViewModel);
         if (success)
         {
-            NavigationManager.NavigateTo("/votes/add");
+            NavigationManager.NavigateTo("/votes");
         }
     }
 }

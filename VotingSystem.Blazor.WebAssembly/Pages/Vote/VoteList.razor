@@ -1,9 +1,43 @@
 ﻿@page "/votes"
 @using VotingSystem.Blazor.WebAssembly.Config
 @using VotingSystem.Blazor.WebAssembly.Services
-@using VotingSystem.Blazor.WebAssembly.ViewModels
 @inject NavigationManager NavigationManager
 @inject IVoteService VoteService
 @inject AppConfig AppConfig
+@inject HttpClient Http
 
-<h1>All votes</h1>
+@if (_isLoading)
+{
+    <p>Loading votes...</p>
+}
+else if (_votes == null || !_votes.Any())
+{
+    <p>You haven't created any votes yet.</p>
+}
+else
+{
+    <div class="container mt-4">
+    <h3>My Votes (@(_votes!.Count))</h3>
+    <ul class="list-group">
+        @foreach (var vote in _votes)
+        {
+            <li class="list-group-item">
+                <strong><a href="@($"/votes/{vote.Id}")">@vote.Question</a></strong> <br />
+                <small class="text-muted">Start: @vote.Start.ToString()</small>
+                <small class="text-muted">End: @vote.End.ToString()</small>
+            </li>
+        }
+    </ul>
+    </div>
+}
+
+@code {
+    private List<VoteViewModel>? _votes;
+    private bool _isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _votes = await VoteService.GetMyVotesAsync();
+        _isLoading = false;
+    }
+}
