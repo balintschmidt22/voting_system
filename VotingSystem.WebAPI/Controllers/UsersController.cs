@@ -121,7 +121,6 @@ public class UsersController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<UserResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

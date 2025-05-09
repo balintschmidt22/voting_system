@@ -41,7 +41,7 @@ namespace VotingSystem.Blazor.WebAssembly.Services
             return new();
         }
 
-        private async Task<List<VoteViewModel>> LoadVotesFromLocalDatabaseAsync()
+        public async Task<List<VoteViewModel>> LoadVotesFromLocalDatabaseAsync()
         {
             return await _votingSystemIndexDatabase.Votes.GetAllAsync<VoteViewModel>();
         }
@@ -79,20 +79,23 @@ namespace VotingSystem.Blazor.WebAssembly.Services
             }
         }
 
-        public async Task<List<VoteViewModel>> GetMyVotesAsync()
+        public async Task<List<VoteViewModel>> GetMyVotesAsync(string userId)
         {
             try
             {
-                var response = await _httpRequestUtility.ExecuteGetHttpRequestAsync<List<VoteResponseDto>>($"votes/my");
-                return _mapper.Map<List<VoteViewModel>>(response.Response);
+                var response = await _httpRequestUtility.ExecutePostHttpRequestAsync<string, List<VoteResponseDto>>(
+                    "votes/my", userId);
+                
+                return _mapper.Map<List<VoteViewModel>>(response);
             }
             catch (HttpRequestErrorException exp)
             {
                 await HandleHttpError(exp.Response);
+                return new List<VoteViewModel>();
             }
-            return new();
         }
-        
+
+
         public async Task<List<UserViewModel>> GetAllUsersAsync()
         {
             try

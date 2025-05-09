@@ -13,6 +13,14 @@ public class VotesService : IVotesService
         _context = context;
     }
     
+    public async Task<IReadOnlyCollection<Vote>> GetVotesAsync()
+    {
+        var query = _context.Votes
+            .OrderBy(m => m.End);
+        
+        return await query.ToListAsync();
+    }
+    
     public async Task AddAsync(Vote vote)
     {
         await CheckIfQuestionExistsAsync(vote);

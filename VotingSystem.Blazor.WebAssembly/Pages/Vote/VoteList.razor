@@ -5,6 +5,7 @@
 @inject IVoteService VoteService
 @inject AppConfig AppConfig
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime
 
 @if (_isLoading)
 {
@@ -37,7 +38,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _votes = await VoteService.GetMyVotesAsync();
+        var id = await JsRuntime.InvokeAsync<string>("localStorage.getItem", ["Id"]);
+        _votes = await VoteService.GetMyVotesAsync(id);
         _isLoading = false;
     }
 }

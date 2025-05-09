@@ -4,6 +4,7 @@ namespace VotingSystem.DataAccess.Services;
 
 public interface IVotesService
 {
+    Task<IReadOnlyCollection<Vote>> GetVotesAsync();
     Task AddAsync(Vote vote);
     Task<IReadOnlyCollection<Vote>> GetMyVotesAsync(string? id);
     Task<IReadOnlyCollection<Vote>> GetActiveVotesAsync(int? count = null);

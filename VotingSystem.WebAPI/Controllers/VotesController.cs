@@ -36,6 +36,20 @@ public class VotesController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
+    public async Task<IActionResult> GetVotes()
+    {
+        var votes = await _votesService.GetVotesAsync();
+        var voteResponseDtos = _mapper.Map<List<VoteResponseDto>>(votes);
+
+        return Ok(voteResponseDtos);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="voteRequestDto"></param>
     /// <returns></returns>
     [HttpPost]
@@ -53,18 +67,17 @@ public class VotesController : ControllerBase
         return CreatedAtAction(nameof(CreateVote), new { id = voteResponseDto.Id }, voteResponseDto);
     }
     
+    
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="userId"></param>
     /// <returns></returns>
-    [HttpGet]
-    [Route("my")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
-    public async Task<IActionResult> GetMyVotes()
+    [HttpPost("my")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<VoteResponseDto>))]
+    public async Task<IActionResult> GetMyVotes([FromBody] string userId)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-        var votes = await _votesService.GetMyVotesAsync("2a549ec8-85a6-426a-9e0c-d5d795608951");
+        var votes = await _votesService.GetMyVotesAsync(userId);
         var voteResponseDtos = _mapper.Map<List<VoteResponseDto>>(votes);
 
         return Ok(voteResponseDtos);
