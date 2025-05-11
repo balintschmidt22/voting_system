@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
@@ -10,6 +11,7 @@ namespace VotingSystem.WebAPI.Controllers;
 /// Controller for vote participations
 /// </summary>
 [ApiController]
+[Authorize]
 [Route("voteparticipations")]
 public class VoteParticipationsController : ControllerBase
 {

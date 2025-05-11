@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
@@ -38,6 +39,7 @@ public class VotesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
     public async Task<IActionResult> GetVotes()
     {
@@ -90,6 +92,7 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("active")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
     public async Task<IActionResult> GetActiveVotes(int? count = null)
     {
@@ -106,6 +109,7 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("closed")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
     public async Task<IActionResult> GetClosedVotes(int? count = null)
     {
@@ -158,6 +162,7 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("search")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(List<VoteResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -181,6 +186,7 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("search-by-date")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(List<VoteResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -201,8 +207,10 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("{id}/results")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(bool))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetVoteResults(int id)
     {
         var vote = await _votesService.GetByIdAsync(id);

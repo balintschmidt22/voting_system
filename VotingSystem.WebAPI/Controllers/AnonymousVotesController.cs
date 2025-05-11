@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
@@ -10,6 +11,7 @@ namespace VotingSystem.WebAPI.Controllers;
 /// Controller for handling anonymous votes
 /// </summary>
 [ApiController]
+[Authorize]
 [Route("anonymousvotes")]
 public class AnonymousVotesController : ControllerBase
 {
@@ -49,7 +51,7 @@ public class AnonymousVotesController : ControllerBase
         return Ok(anonymousVoteResponseDto);
     }
     
-    /// <summary>
+    /*/// <summary>
     /// 
     /// </summary>
     /// <param name="option"></param>
@@ -64,7 +66,7 @@ public class AnonymousVotesController : ControllerBase
         var anonymousVoteResponseDto = _mapper.Map<AnonymousVoteResponseDto>(anonymousVote);
 
         return Ok(anonymousVoteResponseDto);
-    }
+    }*/
     
     /// <summary>
     /// 

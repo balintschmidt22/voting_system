@@ -253,72 +253,72 @@ public static class DbInitializer
 
             VoteParticipation[] voteParticipations =
             [
-                new VoteParticipation
-                {
-                    UserId = user1.Id,
-                    VoteId = 1,
-                },
-                new VoteParticipation
-                {
-                    UserId = user2.Id,
-                    VoteId = 1,
-                },
-                new VoteParticipation
-                {
-                    UserId = user3.Id,
-                    VoteId = 1,
-                },
-                new VoteParticipation
-                {
-                    UserId = user1.Id,
-                    VoteId = 2,
-                },
-                new VoteParticipation
-                {
-                    UserId = user2.Id,
-                    VoteId = 2,
-                },
-                new VoteParticipation
-                {
-                    UserId = user3.Id,
-                    VoteId = 2,
-                },
-                new VoteParticipation
-                {
-                    UserId = user4.Id,
-                    VoteId = 2,
-                },
-                new VoteParticipation
-                {
-                    UserId = user1.Id,
-                    VoteId = 3,
-                },
-                new VoteParticipation
-                {
-                    UserId = user2.Id,
-                    VoteId = 3,
-                },
-                new VoteParticipation
-                {
-                    UserId = user1.Id,
-                    VoteId = 4,
-                },
-                new VoteParticipation
-                {
-                    UserId = user2.Id,
-                    VoteId = 4,
-                },
-                new VoteParticipation
-                {
-                    UserId = user3.Id,
-                    VoteId = 4,
-                },
-                new VoteParticipation
-                {
-                    UserId = user4.Id,
-                    VoteId = 4,
-                },
-            ];
+                              new VoteParticipation
+                              {
+                                  UserId = user1.Id,
+                                  VoteId = 1,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user2.Id,
+                                  VoteId = 1,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user3.Id,
+                                  VoteId = 1,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user1.Id,
+                                  VoteId = 2,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user2.Id,
+                                  VoteId = 2,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user3.Id,
+                                  VoteId = 2,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user4.Id,
+                                  VoteId = 2,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user1.Id,
+                                  VoteId = 3,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user2.Id,
+                                  VoteId = 3,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user1.Id,
+                                  VoteId = 4,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user2.Id,
+                                  VoteId = 4,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user3.Id,
+                                  VoteId = 4,
+                              },
+                              new VoteParticipation
+                              {
+                                  UserId = user4.Id,
+                                  VoteId = 4,
+                              },
+                          ];
 
             await context.VoteParticipations.AddRangeAsync(voteParticipations);
         }
