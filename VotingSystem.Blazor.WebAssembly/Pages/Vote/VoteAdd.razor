@@ -17,29 +17,29 @@
 
         <div class="mb-3">
             <label for="question" class="form-label">Question:</label>
-            <InputText id="question" @bind-Value="_vote.Question" class="form-control" />
+            <InputText id="question" data-testid="question" @bind-Value="_vote.Question" class="form-control" />
             <ValidationMessage For="@(() => _vote.Question)" class="text-danger" />
         </div>
 
         <div class="mb-3">
             <label for="options" class="form-label">Options (separated by ";"):</label>
-            <InputTextArea id="options" @bind-Value="_vote.OptionsRaw" class="form-control" rows="3" />
+            <InputTextArea id="options" data-testid="options" @bind-Value="_vote.OptionsRaw" class="form-control" rows="3" />
             <ValidationMessage For="@(() => _vote.OptionsRaw)" class="text-danger" />
         </div>
 
         <div class="mb-3">
             <label for="start" class="form-label">Start:</label>
-            <InputText id="start" @bind-Value="_startInput" class="form-control" type="datetime-local" />
+            <InputText id="start" data-testid="start" @bind-Value="_startInput" class="form-control" type="datetime-local" />
             <ValidationMessage For="@(() => _vote.Start)" class="text-danger" />
         </div>
 
         <div class="mb-3">
             <label for="end" class="form-label">End:</label>
-            <InputText id="end" @bind-Value="_endInput" class="form-control" type="datetime-local" />
+            <InputText id="end" data-testid="end" @bind-Value="_endInput" class="form-control" type="datetime-local" />
             <ValidationMessage For="@(() => _vote.End)" class="text-danger" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary" data-testid="submit-button">Save</button>
     </EditForm>
 </div>
 

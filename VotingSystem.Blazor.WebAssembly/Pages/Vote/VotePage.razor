@@ -1,8 +1,10 @@
 @page "/votes/{id:int}"
+@using VotingSystem.Blazor.WebAssembly.Config
 @using VotingSystem.Blazor.WebAssembly.Services
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IVoteService VoteService
+@inject AppConfig AppConfig
 
 @if (_isLoading)
 {
@@ -15,7 +17,7 @@ else if (!string.IsNullOrEmpty(_error))
 else if (_vote is not null)
 {
     <div class="container mt-4">
-        <h2>@_vote.Question</h2>
+        <h2 data-testid="question">@_vote.Question</h2>
 
         <p><strong>Start:</strong> @_vote.Start.ToString()</p>
         <p><strong>End:</strong> @_vote.End.ToString()</p>
@@ -77,7 +79,7 @@ else if (_vote is not null)
     private bool _isLoading = true;
     private string? _error;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         try
         {

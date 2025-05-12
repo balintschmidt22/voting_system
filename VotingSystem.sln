@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VotingSystem.Blazor.WebAsse
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VotingSystem.Tests", "VotingSystem.Tests\VotingSystem.Tests.csproj", "{0130BA9B-2472-4C60-B621-6F4743E1AA33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VotingSystem.Blazor.ComponentTests", "VotingSystem.Blazor.ComponentTests\VotingSystem.Blazor.ComponentTests.csproj", "{1E78A65E-F6A1-4B02-BF3B-F9C3D49E5A8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{0130BA9B-2472-4C60-B621-6F4743E1AA33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0130BA9B-2472-4C60-B621-6F4743E1AA33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0130BA9B-2472-4C60-B621-6F4743E1AA33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E78A65E-F6A1-4B02-BF3B-F9C3D49E5A8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E78A65E-F6A1-4B02-BF3B-F9C3D49E5A8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E78A65E-F6A1-4B02-BF3B-F9C3D49E5A8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E78A65E-F6A1-4B02-BF3B-F9C3D49E5A8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

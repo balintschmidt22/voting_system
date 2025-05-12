@@ -25,29 +25,9 @@ public class VoteViewModel
                                ?? Array.Empty<string>();
 
 
-    //[Required(ErrorMessage = "Start shouldn't be empty")]
-    //[CustomValidation(typeof(VoteViewModel), nameof(ValidateStart))]
     public DateTime? Start { get; set; }
     
-    //[Required(ErrorMessage = "End shouldn't be empty")]
-    //[CustomValidation(typeof(VoteViewModel), nameof(ValidateEnd))]
     public DateTime? End { get; set; }
     
     public ICollection<VoteParticipationResponseDto>? VoteParticipations { get; set; }
-    
-    public static ValidationResult? ValidateStart(DateTime date, ValidationContext context)
-    {
-        return (date > DateTime.Now)
-            ? ValidationResult.Success
-            : new ValidationResult("The start date must be in the future.", new[] { nameof(VoteViewModel.Start) });
-    }
-    
-    public static ValidationResult? ValidateEnd(DateTime date, ValidationContext context)
-    {
-        return (date > DateTime.Now)
-            ? ValidationResult.Success
-            : new ValidationResult("The end date must be in the future.", new[] { nameof(VoteViewModel.End) });
-    }
-    
-    //end > start + 15
 }

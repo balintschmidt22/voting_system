@@ -10,9 +10,9 @@
             <NavLink class="nav-item-link me-3" href="/votes">Votes</NavLink>
             <NavLink class="nav-item-link me-4" href="/votes/add">Add Vote</NavLink>
 
-            <span class="welcome-text me-3">Welcome, @_userName!</span>
+            <span class="welcome-text me-3" data-testid="welcome">Welcome, @_userName!</span>
 
-            <button class="btn btn-logout d-flex align-items-center" @onclick="Logout">
+            <button class="btn btn-logout d-flex align-items-center" @onclick="Logout" data-testid="logout">
                 <i class="bi bi-box-arrow-right me-1"></i> Logout
             </button>
         </div>
