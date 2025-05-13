@@ -19,6 +19,7 @@ export function HomePage() {
     const [error, setError] = useState<string | null>(null);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [searchInput, setSearchInput] = useState("");
 
     useEffect(() => {
         async function loadContent() {
@@ -68,21 +69,27 @@ export function HomePage() {
                   </span>
                     <input
                         type="text"
-                        className="form-control border-start-0"
+                        className="form-control"
                         placeholder="Search votes..."
-                        onChange={async (e) => {
-                            const value = e.target.value;
-                            if (value === "") {
+                        onChange={(e) => setSearchInput(e.target.value)}
+                    />
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={async () => {
+                            if (searchInput === "") {
+
                                 setVotes(await getActiveVotes());
                                 return;
                             }
                             try {
-                                setVotes(await getVoteBySubString(value, true));
+                                setVotes(await getVoteBySubString(searchInput, true));
                             } catch (e) {
-                                //
+
                             }
                         }}
-                    />
+                    >
+                        Search
+                    </button>
                 </div>
                 <div className="input-group mb-4" style={{ maxWidth: "450px" }}>
                     <span className="input-group-text bg-white">📅</span>
@@ -125,22 +132,27 @@ export function HomePage() {
                   </span>
                     <input 
                         type="text"
-                        className="form-control border-start-0"
+                        className="form-control"
                         placeholder="Search votes..."
-                        onChange={async (e) => {
-                            const value = e.target.value;
-                            if (value === "") {
-                                
+                        onChange={(e) => setSearchInput(e.target.value)}
+                    />
+                    <button
+                        className="btn btn-outline-primary"
+                        onClick={async () => {
+                            if (searchInput === "") {
+
                                 setVotes(await getClosedVotes());
                                 return;
                             }
                             try {
-                                setVotes(await getVoteBySubString(value, false));
+                                setVotes(await getVoteBySubString(searchInput, false));
                             } catch (e) {
-                                
+
                             }
                         }}
-                    />
+                    >
+                        Search
+                    </button>
                 </div>
                 <div className="input-group mb-4" style={{ maxWidth: "450px" }}>
                     <span className="input-group-text bg-white">📅</span>

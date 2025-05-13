@@ -55,10 +55,6 @@ const router = createBrowserRouter([
                 path: "/thank-you",
                 element: <Protected><VoteSuccessPage /></Protected>
             },
-/*            {
-                path: "/screenings/:screeningId/create-reservation",
-                element: <CreateReservationPage />,
-            },*/
             {
                 path: "*",
                 element: <NotFoundPage />

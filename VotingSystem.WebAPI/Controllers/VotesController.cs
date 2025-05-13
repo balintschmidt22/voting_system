@@ -145,11 +145,13 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("voted/{id:int}/{user}")]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(bool))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserAlreadyVoted([FromRoute] int id, string user)
     {
         var vote = await _votesService.GetByIdAsync(id);
+        
         var voted = vote.VoteParticipations.Any(x => x.UserId == user);
 
         return Ok(voted);
@@ -162,7 +164,6 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("search")]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(List<VoteResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -186,7 +187,6 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpPost]
     [Route("search-by-date")]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(List<VoteResponseDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -207,7 +207,6 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("{id}/results")]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(bool))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

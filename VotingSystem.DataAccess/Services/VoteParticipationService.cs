@@ -43,40 +43,4 @@ public class VoteParticipationService : IVoteParticipationService
         return await query
             .ToListAsync();
     }
-    
-    public async Task AddVoteParticipationAsync(string userId, int voteId)
-    {
-        await CheckIfVoteExistsAsync(userId, voteId);
-        await CheckIfVoteIsClosed(voteId);
-        
-        var vp = new VoteParticipation
-        {
-            UserId = userId,
-            VoteId = voteId,
-            VotedAt = DateTime.Now
-        };
-        
-        try
-        {
-            await _context.VoteParticipations.AddAsync(vp);
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex)
-        {
-            throw new SaveFailedException("Failed to submit new vote.", ex);
-        }
-    }
-    
-    private async Task CheckIfVoteExistsAsync(string userId, int voteId)
-    {
-        if (await _context.VoteParticipations.AnyAsync(v => string.Equals(v.UserId, userId)
-                                                       && v.VoteId == voteId))
-            throw new InvalidDataException("Already voted!");
-    }
-    
-    private async Task CheckIfVoteIsClosed(int voteId)
-    {
-        if (await _context.Votes.AnyAsync(v => v.Id == voteId && v.End <= DateTime.Now))
-            throw new InvalidDataException("Vote is closed!");
-    }
 }

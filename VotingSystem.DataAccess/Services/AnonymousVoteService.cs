@@ -44,10 +44,12 @@ public class AnonymousVoteService : IAnonymousVoteService
             .ToListAsync();
     }
     
-    public async Task AddAnonymousVoteAsync(int voteId, string option)
+    public async Task AddAnonymousVoteAsync(string userId, int voteId, string option)
     {
+        await CheckIfVoteExistsAsync(userId, voteId);
         await CheckIfOptionExistsAsync(voteId, option);
         await CheckIfVoteIsClosed(voteId);
+        await CheckIfVoteIsActiveAlready(voteId);
 
         var av = new AnonymousVote
         {
@@ -55,10 +57,18 @@ public class AnonymousVoteService : IAnonymousVoteService
             SelectedOption = option,
             SubmittedAt = DateTime.Now
         };
-
+        
+        var vp = new VoteParticipation
+        {
+            UserId = userId,
+            VoteId = voteId,
+            VotedAt = DateTime.Now
+        };
+        
         try
         {
             await _context.AnonymousVotes.AddAsync(av);
+            await _context.VoteParticipations.AddAsync(vp);
             await _context.SaveChangesAsync();
         }
         catch (DbUpdateException ex)
@@ -73,10 +83,23 @@ public class AnonymousVoteService : IAnonymousVoteService
             throw new InvalidDataException("Vote does not have this option!");
     }
     
+    private async Task CheckIfVoteExistsAsync(string userId, int voteId)
+    {
+        if (await _context.VoteParticipations.AnyAsync(v => string.Equals(v.UserId, userId)
+                                                            && v.VoteId == voteId))
+            throw new InvalidDataException("Already voted!");
+    }
+    
     private async Task CheckIfVoteIsClosed(int voteId)
     {
-        if (await _context.Votes.AnyAsync(v => v.Id == voteId && v.End <= DateTime.Now))
+        if (await _context.Votes.AnyAsync(v => v.Id == voteId && v.End < DateTime.Now))
             throw new InvalidDataException("Vote is closed!");
+    }
+    
+    private async Task CheckIfVoteIsActiveAlready(int voteId)
+    {
+        if (await _context.Votes.AnyAsync(v => v.Id == voteId && v.Start > DateTime.Now))
+            throw new InvalidDataException("Vote is not active yet!");
     }
     
     public async Task<Dictionary<string, int>> GetVoteResultsAsync(int voteId)

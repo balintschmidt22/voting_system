@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VotingSystem.DataAccess.Models;
@@ -17,21 +18,21 @@ public class AnonymousVotesController : ControllerBase
 {
     private readonly IMapper _mapper;
     private readonly IAnonymousVoteService _anonymousVoteService;
-    private readonly IVotesService _votesService;
+    private readonly IVoteParticipationService _voteParticipationService;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="mapper"></param>
     /// <param name="anonymousVoteService"></param>
-    /// <param name="votesService"></param>
+    /// <param name="voteParticipationService"></param>
     public AnonymousVotesController(IMapper mapper, 
         IAnonymousVoteService anonymousVoteService,
-        IVotesService votesService)
+        IVoteParticipationService voteParticipationService)
     {
         _mapper = mapper;
         _anonymousVoteService = anonymousVoteService;
-        _votesService = votesService;
+        _voteParticipationService = voteParticipationService;
     }
     
     /// <summary>
@@ -51,23 +52,6 @@ public class AnonymousVotesController : ControllerBase
         return Ok(anonymousVoteResponseDto);
     }
     
-    /*/// <summary>
-    /// 
-    /// </summary>
-    /// <param name="option"></param>
-    /// <returns></returns>
-    [HttpGet]
-    [Route("option/{option}")]
-    [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(AnonymousVoteResponseDto))]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetAnonymousVoteByOption([FromRoute] string option)
-    {
-        var anonymousVote = await _anonymousVoteService.GetAnonymousVotesByOptionAsync(option);
-        var anonymousVoteResponseDto = _mapper.Map<AnonymousVoteResponseDto>(anonymousVote);
-
-        return Ok(anonymousVoteResponseDto);
-    }*/
-    
     /// <summary>
     /// 
     /// </summary>
@@ -82,7 +66,25 @@ public class AnonymousVotesController : ControllerBase
     public async Task<IActionResult> AddNewAnonymousVote(
         [FromBody] AnonymousVoteRequestDto anonymousVoteRequestDto)
     {
-        await _anonymousVoteService.AddAnonymousVoteAsync(anonymousVoteRequestDto.VoteId, anonymousVoteRequestDto.SelectedOption);
-        return Created();
+        var userId = this.User.FindFirstValue("id");
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        if (!string.Equals(userId, anonymousVoteRequestDto.UserId))
+        {
+            return Forbid();
+        }
+        
+        try
+        {
+            await _anonymousVoteService.AddAnonymousVoteAsync(anonymousVoteRequestDto.UserId, anonymousVoteRequestDto.VoteId, anonymousVoteRequestDto.SelectedOption);
+            return Created();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Failed to add vote. " + ex.Message });
+        }
     }
 }

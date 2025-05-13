@@ -46,23 +46,4 @@ public class VoteParticipationsController : ControllerBase
 
         return Ok(voteParticipationResponseDto);
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="voteParticipationRequestDto"></param>
-    /// <returns></returns>
-    [HttpPost]
-    [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(VoteParticipationResponseDto))]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> AddNewVoteParticipation(
-        [FromBody] VoteParticipationRequestDto voteParticipationRequestDto)
-    {
-        await _voteParticipationService.AddVoteParticipationAsync(voteParticipationRequestDto.UserId, voteParticipationRequestDto.VoteId);
-
-        return Created();
-    }
 }

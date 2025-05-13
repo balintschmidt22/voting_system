@@ -1,7 +1,6 @@
 import { get, postAsJson, postAsJsonWithoutResponse } from "@/api/client/http";
 import { VoteResponseDto } from "../models/VoteResponseDto";
 import { AnonymousVoteRequestDto } from "../models/AnonymousVoteRequestDto";
-import { VoteParticipationRequestDto } from "../models/VoteParticipationRequestDto";
 
 export async function getVotes(count?: number): Promise<VoteResponseDto[]> {
     return await get<VoteResponseDto[]>("votes", count ? { count: count.toString() } : undefined);
@@ -23,9 +22,6 @@ export async function getUserAlreadyVoted(id: number, user: string | undefined):
     return await get<boolean>(`votes/voted/${id}/${user}`)
 }
 
-export async function addVoteParticipation(body: VoteParticipationRequestDto): Promise<void> {
-    await postAsJsonWithoutResponse<VoteParticipationRequestDto>("voteparticipations", body);
-}
 export async function addAnonymousVote(body: AnonymousVoteRequestDto): Promise<void> {
     await postAsJsonWithoutResponse<AnonymousVoteRequestDto>("anonymousvotes", body);
 }

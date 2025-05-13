@@ -36,8 +36,14 @@ internal class UsersService : IUsersService
         user.RefreshToken = Guid.NewGuid();
 
         var result = await _userManager.CreateAsync(user, password);
-        if (!result.Succeeded)
+        if (result.Succeeded)
+        {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        }
+        else
+        {
             throw new InvalidDataException($"User creation failed: {result.Errors.First().Description}");
+        }
     }
 
     public async Task<(string authToken, string refreshToken, string userId)> LoginAsync(string email, string password)

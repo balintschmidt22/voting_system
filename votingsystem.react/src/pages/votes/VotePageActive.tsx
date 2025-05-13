@@ -1,9 +1,7 @@
 import { useParams } from "react-router-dom"; // for routing and accessing params
 import { useEffect, useState } from "react";
 import {addAnonymousVote, getUserAlreadyVoted, getVote} from "@/api/client/votes-client";
-import { addVoteParticipation } from "@/api/client/votes-client";
 import { VoteResponseDto } from "@/api/models/VoteResponseDto";
-import { VoteParticipationRequestDto } from "@/api/models/VoteParticipationRequestDto";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { ErrorAlert } from "@/components/alerts/ErrorAlert";
 import { useUserContext } from '@/contexts/UserContext';
@@ -95,14 +93,8 @@ export function VotePageActive() {
 
         setIsLoading(true);
         try {
-            const voteParticipation: VoteParticipationRequestDto = {
-                userId: user.id, // The current logged-in user
-                voteId: voteId, // The selected vote (ensured non-null by the `!` operator)
-            };
-            
-            await addVoteParticipation(voteParticipation);
-
             const anonymousVote: AnonymousVoteRequestDto = {
+                userId: user.id,
                 voteId: voteId,
                 selectedOption,
             };
