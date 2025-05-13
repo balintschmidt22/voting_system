@@ -1,0 +1,104 @@
+@page "/votes/{id:int}"
+@using VotingSystem.Blazor.WebAssembly.Config
+@using VotingSystem.Blazor.WebAssembly.Services
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IVoteService VoteService
+@inject AppConfig AppConfig
+
+@if (_isLoading)
+{
+    <p>Loading vote...</p>
+}
+else if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger">@_error</div>
+}
+else if (_vote is not null)
+{
+    <div class="container mt-4">
+        <h2 data-testid="question">@_vote.Question</h2>
+
+        <p><strong>Start:</strong> @_vote.Start.ToString()</p>
+        <p><strong>End:</strong> @_vote.End.ToString()</p>
+
+        <h4 class="mt-4">Options</h4>
+        <ul class="list-group mb-3">
+            @foreach (var option in _vote.Options)
+            {
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>@option</span>
+                </li>
+            }
+        </ul>
+    
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h5>
+                    <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#votedCollapse">
+                        Users who voted (@_usersVoted.Count)
+                    </button>
+                </h5>
+                <div class="collapse show" id="votedCollapse">
+                    <ul class="list-group">
+                        @foreach (var user in _usersVoted)
+                        {
+                            <li class="list-group-item">@user.UserName</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h5>
+                    <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#notVotedCollapse">
+                        Users who did not vote (@_usersNotVoted.Count)
+                    </button>
+                </h5>
+                <div class="collapse show" id="notVotedCollapse">
+                    <ul class="list-group">
+                        @foreach (var user in _usersNotVoted)
+                        {
+                            <li class="list-group-item">@user.UserName</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private VoteViewModel? _vote;
+    private List<UserViewModel> _allUsers = new();
+    private List<UserViewModel> _usersVoted = new();
+    private List<UserViewModel> _usersNotVoted = new();
+    private bool _isLoading = true;
+    private string? _error;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            _vote = await VoteService.GetVoteByIdAsync(Id);
+            _allUsers = await VoteService.GetAllUsersAsync();
+
+            if (_vote is not null)
+            {
+                var votedUserIds = _vote.VoteParticipations?.Select(p => p.User.Id).ToHashSet();
+                _usersVoted = _allUsers.Where(u => votedUserIds != null && votedUserIds.Contains(u.Id)).ToList();
+                _usersNotVoted = _allUsers.Where(u => votedUserIds != null && !votedUserIds.Contains(u.Id)).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = "Failed to load vote or user data.";
+            Console.Error.WriteLine(ex);
+        }
+
+        _isLoading = false;
+    }
+}

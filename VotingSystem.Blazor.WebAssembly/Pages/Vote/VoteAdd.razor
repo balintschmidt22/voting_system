@@ -1,0 +1,131 @@
+@page "/votes/add"
+@using System.Text.Json
+@using VotingSystem.Blazor.WebAssembly.Config
+@using VotingSystem.Blazor.WebAssembly.Services
+@using VotingSystem.Blazor.WebAssembly.ViewModels
+@using VotingSystem.Shared.Models
+@inject NavigationManager NavigationManager
+@inject IVoteService VoteService
+@inject AppConfig AppConfig
+@inject IJSRuntime JsRuntime
+
+<div class="container mt-4">
+    <h1>Create new Vote</h1>
+
+    <EditForm Model="_vote" OnValidSubmit="SaveVoteAsync">
+        <DataAnnotationsValidator />
+
+        <div class="mb-3">
+            <label for="question" class="form-label">Question:</label>
+            <InputText id="question" data-testid="question" @bind-Value="_vote.Question" class="form-control" />
+            <ValidationMessage For="@(() => _vote.Question)" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="options" class="form-label">Options (separated by ";"):</label>
+            <InputTextArea id="options" data-testid="options" @bind-Value="_vote.OptionsRaw" class="form-control" rows="3" />
+            <ValidationMessage For="@(() => _vote.OptionsRaw)" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="start" class="form-label">Start:</label>
+            <InputText id="start" data-testid="start" @bind-Value="_startInput" class="form-control" type="datetime-local" />
+            <ValidationMessage For="@(() => _vote.Start)" class="text-danger" />
+        </div>
+
+        <div class="mb-3">
+            <label for="end" class="form-label">End:</label>
+            <InputText id="end" data-testid="end" @bind-Value="_endInput" class="form-control" type="datetime-local" />
+            <ValidationMessage For="@(() => _vote.End)" class="text-danger" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" data-testid="submit-button">Save</button>
+    </EditForm>
+</div>
+
+@if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger mt-2">@_error</div>
+}
+
+@code {
+    private string? _startInput;
+    private string? _endInput;
+    private VoteViewModel _vote = new();
+    private string? _error;
+
+    private async Task SaveVoteAsync()
+    {
+        _error = null;
+        
+        var localVotes = await VoteService.GetVotesAsync(false);
+        var exists = localVotes.Any(v => string.Equals(v.Question?.Trim(), _vote.Question?.Trim(), StringComparison.OrdinalIgnoreCase));
+        if (exists)
+        {
+            _error = "A vote with this question already exists.";
+            return;
+        }
+        
+        var options = _vote.Options;
+        if (options.Length < 2)
+        {
+            _error = "You must provide at least two options separated by a semicolon (;).";
+            return;
+        }
+        
+        if (!DateTime.TryParse(_startInput, out var parsedStart))
+        {
+            _error = "Start date is required!";
+            return;
+        }
+
+        if (!DateTime.TryParse(_endInput, out var parsedEnd))
+        {
+            _error = "End date is required!";
+            return;
+        }
+        
+        _vote.Start = parsedStart;
+        _vote.End = parsedEnd;
+        
+        if (_vote.Start == null || _vote.End == null)
+        {
+            _error = "Start and End date must be provided.";
+            return;
+        }
+
+        if (_vote.Start <= DateTime.Now)
+        {
+            _error = "Start date must be in the future.";
+            return;
+        }
+
+        if (_vote.End <= DateTime.Now)
+        {
+            _error = "End date must be in the future.";
+            return;
+        }
+
+        if (_vote.End <= _vote.Start.Value.AddMinutes(15))
+        {
+            _error = "End date must be at least 15 minutes after the start date.";
+            return;
+        }
+        
+        var id = await JsRuntime.InvokeAsync<string>("localStorage.getItem", ["Id"]);
+        if (!string.IsNullOrWhiteSpace(id))
+        {
+            try
+            {   
+                _vote.UserId = id;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Failed to read user: {ex.Message}");
+            }
+        }
+        
+        await VoteService.CreateVoteAsync(_vote);
+        NavigationManager.NavigateTo("/");
+    }
+}

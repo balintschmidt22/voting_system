@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.1184077">
+  <Import Project="..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.props" Condition="Exists('..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.props')" />
+  <PropertyGroup>
+    <StartupCommand>npm run dev</StartupCommand>
+    <JavaScriptTestRoot>src\</JavaScriptTestRoot>
+    <JavaScriptTestFramework>Jest</JavaScriptTestFramework>
+    <!-- Allows the build (or compile) script located on package.json to run on Build -->
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+    <!-- Folder where production build objects will be placed -->
+    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.props'))" />
+    <Error Condition="!Exists('..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.targets'))" />
+  </Target>
+  <Import Project="..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.targets" Condition="Exists('..\packages\ELTE.FI.SARuleSet.3.1.0\build\ELTE.FI.SARuleSet.targets')" />
+</Project>
