@@ -105,8 +105,8 @@ public class VoteAddTests : IDisposable
         // Assert
         cut.WaitForAssertion(() =>
         {
-            /*var voteQuestion = cut.Find("[data-testid='question']");
-            Assert.Equal($"{selectedVote.Question}", voteQuestion.TextContent);*/
+            var voteQuestion = cut.Find("[data-testid='question']");
+            Assert.Equal($"{selectedVote.Question}", voteQuestion.TextContent);
 
             var voteStart = cut.WaitForElements("p").First(p => p.TextContent.Contains("Start:"));
             Assert.Contains(selectedVote.Start.ToString() ?? string.Empty, voteStart.TextContent);
