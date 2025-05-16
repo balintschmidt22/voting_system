@@ -66,6 +66,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
     [Fact]
     public async Task GetVotes_ReturnsAllVotes()
     {
+        await Login(UserLogin);
+        
         // Act
         var response = await _client.GetAsync("/votes");
 
@@ -79,6 +81,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
     [Fact]
     public async Task GetActiveVotes_ReturnsAllActiveVotes()
     {
+        await Login(UserLogin);
+        
         // Act
         var response = await _client.GetAsync("/votes/active");
 
@@ -92,6 +96,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
     [Fact]
     public async Task GetClosedVotes_ReturnsAllClosedVotes()
     {
+        await Login(UserLogin);
+        
         // Act
         var response = await _client.GetAsync("/votes/closed");
 
@@ -188,6 +194,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetUserVotedByVoteId_ReturnsNotFound_WhenUserNotExists()
          {
+             await Login(UserLogin);
+             
              // Arrange
              const int voteId = 2;
              const string userId = "100";
@@ -203,9 +211,10 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetUserVotedByVoteId_ReturnsNotFound_WhenVoteNotExists()
          {
+             await Login(UserLogin);
              // Arrange
              const int voteId = 99;
-             const string userId = "100";
+             const string userId = "2a549ec8-85a6-426a-9e0c-d5d795608951";
      
              // Act
              var response = await _client.GetAsync($"/votes/voted/{voteId}/{userId}");
@@ -219,9 +228,10 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetUserVotedByVoteId_ReturnsNotFound_WhenVoteAndUserNotExists()
          {
+             await Login(UserLogin);
              // Arrange
              const int voteId = 99;
-             const string userId = "100";
+             const string userId = "100" ;
      
              // Act
              var response = await _client.GetAsync($"/votes/voted/{voteId}/{userId}");
@@ -233,6 +243,161 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          }
     
     
+    #endregion
+    
+    #region Create
+
+    [Fact]
+    public async Task CreateVote_ReturnsBadRequest_WhenOptionsAreInvalid()
+    {
+        // Arrange
+        var invalidVote = new VoteRequestDto
+        {
+            UserId = "id",
+            Question = "Will this test work?",
+            Options = ["Yes"],
+            Start = DateTime.Now + TimeSpan.FromHours(1),
+            End = DateTime.Now + TimeSpan.FromHours(10)
+        };
+
+        // Act
+        await Login(UserLogin);
+        var response = await _client.PostAsJsonAsync("/votes", invalidVote);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        Assert.NotNull(problemDetails);
+    }
+
+    [Fact]
+    public async Task CreateVote_ReturnsConflict_WhenQuestionExists()
+    {
+        // Arrange
+        var newVote = new VoteRequestDto
+        {
+            UserId = "id",
+            Question = "What is the capital of the USA?",
+            Options = ["Yes", "No", "Maybe"],
+            Start = DateTime.Now + TimeSpan.FromHours(1),
+            End = DateTime.Now + TimeSpan.FromHours(10)
+        };
+
+        // Act
+        await Login(UserLogin);
+        var response = await _client.PostAsJsonAsync("/votes", newVote);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.NotNull(problemDetails);
+    }
+
+    [Fact]
+    public async Task CreateVote_AddsVote_WhenDataIsValid()
+    {
+        // Arrange
+        var newVote = new VoteRequestDto
+        {
+            UserId = "id",
+            Question = "Will this test work?",
+            Options = ["Yes", "No", "Maybe"],
+            Start = DateTime.Now + TimeSpan.FromHours(1),
+            End = DateTime.Now + TimeSpan.FromHours(10)
+        };
+
+
+        // Act
+        await Login(UserLogin);
+        var response = await _client.PostAsJsonAsync("/votes", newVote);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var createdVote = await response.Content.ReadFromJsonAsync<VoteResponseDto>();
+        Assert.NotNull(createdVote);
+        Assert.Equal(newVote.Question, createdVote.Question);
+        Assert.Equal(newVote.Options, createdVote.Options);
+    }
+    
+    [Fact]
+    public async Task GetMyVotes_ReturnsVotesOfUser()
+    {
+        await Login(UserLogin);
+
+        var userId = "2a549ec8-85a6-426a-9e0c-d5d795608951"; // ID for user2@gmail.com (based on seeded data)
+
+        var response = await _client.PostAsJsonAsync("/votes/my", userId);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var votes = await response.Content.ReadFromJsonAsync<List<VoteResponseDto>>();
+
+        Assert.NotNull(votes);
+        Assert.All(votes, vote => Assert.Equal(userId, vote.User.Id));
+    }
+
+    [Fact]
+    public async Task GetVoteBySubString_ReturnsVotesMatchingSubstring()
+    {
+        await Login(UserLogin);
+
+        var body = new SearchRequestDto
+        {
+            Sub = "capital",
+            IsActive = true
+        };
+
+        var response = await _client.PostAsJsonAsync("/votes/search", body);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var votes = await response.Content.ReadFromJsonAsync<List<VoteResponseDto>>();
+
+        Assert.NotNull(votes);
+        Assert.All(votes, vote => Assert.Contains("capital", vote.Question, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task GetVoteBySubString_ReturnsBadRequest_WhenSubStringIsEmpty()
+    {
+        await Login(UserLogin);
+
+        var body = new SearchRequestDto
+        {
+            Sub = "",
+            IsActive = true
+        };
+
+        var response = await _client.PostAsJsonAsync("/votes/search", body);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var message = await response.Content.ReadAsStringAsync();
+        Assert.Contains("Search term cannot be empty", message);
+    }
+
+    [Fact]
+    public async Task GetVoteByDate_ReturnsVotesWithinDateRange()
+    {
+        await Login(UserLogin);
+
+        var body = new SearchDateRequestDto
+        {
+            Start = DateTime.Now - TimeSpan.FromDays(1),
+            End = DateTime.Now + TimeSpan.FromDays(1),
+            IsActive = true
+        };
+
+        var response = await _client.PostAsJsonAsync("/votes/search-by-date", body);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var votes = await response.Content.ReadFromJsonAsync<List<VoteResponseDto>>();
+
+        Assert.NotNull(votes);
+        Assert.All(votes, vote =>
+        {
+            Assert.True(vote.Start >= body.Start);
+            Assert.True(vote.End <= body.End);
+        });
+    }
+
     #endregion
     
     #region Helpers
