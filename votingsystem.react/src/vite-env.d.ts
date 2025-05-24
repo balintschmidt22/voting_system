@@ -2,7 +2,6 @@
 
 interface ImportMetaEnv {
     readonly VITE_APP_API_BASEURL: string;
-    readonly VITE_APP_MAX_SEATS: string;
 }
   
 interface ImportMeta {

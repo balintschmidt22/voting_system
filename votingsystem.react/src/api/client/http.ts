@@ -25,6 +25,7 @@ export async function postAsJson<TRequest, TResponse>(url: string, body?: TReque
         body: body ? JSON.stringify(body) : undefined,
         headers: {
             "Content-Type": "application/json",
+            ...createAuthHeader()
         }
     });
     await throwErrorIfNotOk(res);

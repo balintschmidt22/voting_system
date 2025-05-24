@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Exceptions;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
@@ -41,9 +42,16 @@ public class VoteParticipationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetVoteParticipationById([FromRoute] int id)
     {
-        var voteParticipation = await _voteParticipationService.GetByIdAsync(id);
-        var voteParticipationResponseDto = _mapper.Map<VoteParticipationResponseDto>(voteParticipation);
+        try
+        {
+            var voteParticipation = await _voteParticipationService.GetByIdAsync(id);
+            var voteParticipationResponseDto = _mapper.Map<VoteParticipationResponseDto>(voteParticipation);
 
-        return Ok(voteParticipationResponseDto);
+            return Ok(voteParticipationResponseDto);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(new { message =  ex.Message});
+        }
     }
 }

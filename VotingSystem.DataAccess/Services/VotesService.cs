@@ -21,10 +21,12 @@ public class VotesService : IVotesService
         return await query.ToListAsync();
     }
     
-    public async Task AddAsync(Vote vote)
+    public async Task AddAsync(Vote vote, string userId)
     {
         await CheckIfQuestionExistsAsync(vote);
 
+        vote.UserId = userId;
+        
         try
         {
             await _context.Votes.AddAsync(vote);

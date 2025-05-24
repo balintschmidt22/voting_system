@@ -11,8 +11,4 @@ public record UserResponseDto
     public required string UserName { get; init; }
     
     public required string Email { get; init; }
-
-    public DateTime CreatedAt { get; init; }
-    
-    public DateTime UpdatedAt { get; init; }
 }

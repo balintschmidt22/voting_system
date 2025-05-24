@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Exceptions;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
@@ -41,15 +42,22 @@ public class AnonymousVotesController : ControllerBase
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet]
+    [Authorize]
     [Route("{id}")]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(AnonymousVoteResponseDto))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetAnonymousVoteById([FromRoute] int id)
     {
-        var anonymousVote = await _anonymousVoteService.GetByIdAsync(id);
-        var anonymousVoteResponseDto = _mapper.Map<AnonymousVoteResponseDto>(anonymousVote);
-
-        return Ok(anonymousVoteResponseDto);
+        try
+        {
+            var anonymousVote = await _anonymousVoteService.GetByIdAsync(id);
+            var anonymousVoteResponseDto = _mapper.Map<AnonymousVoteResponseDto>(anonymousVote);
+            return Ok(anonymousVoteResponseDto);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(new { message =  ex.Message});
+        }
     }
     
     /// <summary>
@@ -58,6 +66,7 @@ public class AnonymousVotesController : ControllerBase
     /// <param name="anonymousVoteRequestDto"></param>
     /// <returns></returns>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status201Created, type: typeof(AnonymousVoteResponseDto))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -66,25 +75,20 @@ public class AnonymousVotesController : ControllerBase
     public async Task<IActionResult> AddNewAnonymousVote(
         [FromBody] AnonymousVoteRequestDto anonymousVoteRequestDto)
     {
-        var userId = this.User.FindFirstValue("id");
-        if (userId == null)
-        {
-            return Unauthorized();
-        }
-
-        if (!string.Equals(userId, anonymousVoteRequestDto.UserId))
-        {
-            return Forbid();
-        }
-        
         try
         {
-            await _anonymousVoteService.AddAnonymousVoteAsync(anonymousVoteRequestDto.UserId, anonymousVoteRequestDto.VoteId, anonymousVoteRequestDto.SelectedOption);
+            var userId = this.User.FindFirstValue("id");
+
+            await _anonymousVoteService.AddAnonymousVoteAsync(userId!, anonymousVoteRequestDto.VoteId, anonymousVoteRequestDto.SelectedOption);
             return Created();
         }
-        catch (Exception ex)
+        catch (InvalidDataException ex)
         {
-            return BadRequest(new { message = "Failed to add vote. " + ex.Message });
+            return BadRequest(new { message =  ex.Message});
+        }
+        catch (SaveFailedException ex)
+        {
+            return StatusCode(500, new { message =  ex.Message});
         }
     }
 }

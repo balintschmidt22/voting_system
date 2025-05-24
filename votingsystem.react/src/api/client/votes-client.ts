@@ -43,10 +43,6 @@ export async function getVotesByDateInterval(start: string, end: string, isActiv
 
 
 export async function getVoteResults(voteId: number): Promise<{ [option: string]: number }> {
-    const response = await fetch(`/api/votes/${voteId}/results`);
-    if (!response.ok) {
-        throw new Error("Failed to fetch vote results");
-    }
-    const data = await response.json();
+    const data = await get<{ results: { [option: string]: number } }>(`votes/${voteId}/results`);
     return data.results;
 }
