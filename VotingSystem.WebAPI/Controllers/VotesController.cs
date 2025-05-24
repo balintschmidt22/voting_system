@@ -2,6 +2,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using VotingSystem.DataAccess.Exceptions;
 using VotingSystem.DataAccess.Models;
 using VotingSystem.DataAccess.Services;
 using VotingSystem.Shared.Models;
@@ -12,6 +13,7 @@ namespace VotingSystem.WebAPI.Controllers;
 /// 
 /// </summary>
 [ApiController]
+[Authorize]
 [Route("/votes")]
 public class VotesController : ControllerBase
 {
@@ -39,7 +41,6 @@ public class VotesController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
     public async Task<IActionResult> GetVotes()
     {
@@ -63,22 +64,35 @@ public class VotesController : ControllerBase
     public async Task<IActionResult> CreateVote([FromBody] VoteRequestDto voteRequestDto)
     {
         var vote = _mapper.Map<Vote>(voteRequestDto);
-        await _votesService.AddAsync(vote);
+        var userId = this.User.FindFirstValue("id");
 
-        var voteResponseDto = _mapper.Map<VoteResponseDto>(vote);
-        return CreatedAtAction(nameof(CreateVote), new { id = voteResponseDto.Id }, voteResponseDto);
+        try
+        {
+            await _votesService.AddAsync(vote, userId!);
+
+            var voteResponseDto = _mapper.Map<VoteResponseDto>(vote);
+            return CreatedAtAction(nameof(CreateVote), new { id = voteResponseDto.Id }, voteResponseDto);
+        }
+        catch (InvalidDataException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (SaveFailedException ex)
+        {
+            return StatusCode(500, new { message = ex.Message });
+        }
     }
     
     
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="userId"></param>
     /// <returns></returns>
-    [HttpPost("my")]
+    [HttpGet("my")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<VoteResponseDto>))]
-    public async Task<IActionResult> GetMyVotes([FromBody] string userId)
+    public async Task<IActionResult> GetMyVotes()
     {
+        var userId = this.User.FindFirstValue("id");
         var votes = await _votesService.GetMyVotesAsync(userId);
         var voteResponseDtos = _mapper.Map<List<VoteResponseDto>>(votes);
 
@@ -92,7 +106,6 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("active")]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
     public async Task<IActionResult> GetActiveVotes(int? count = null)
     {
@@ -109,7 +122,6 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("closed")]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(List<VoteResponseDto>))]
     public async Task<IActionResult> GetClosedVotes(int? count = null)
     {
@@ -131,10 +143,16 @@ public class VotesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetVoteById([FromRoute] int id)
     {
-        var vote = await _votesService.GetByIdAsync(id);
-        var voteResponseDto = _mapper.Map<VoteResponseDto>(vote);
-
-        return Ok(voteResponseDto);
+        try
+        {
+            var vote = await _votesService.GetByIdAsync(id);
+            var voteResponseDto = _mapper.Map<VoteResponseDto>(vote);
+            return Ok(voteResponseDto);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(new { message =  ex.Message});
+        }
     }
 
     /// <summary>
@@ -145,16 +163,22 @@ public class VotesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [Route("voted/{id:int}/{user}")]
-    [Authorize]
     [ProducesResponseType(statusCode: StatusCodes.Status200OK, type: typeof(bool))]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetUserAlreadyVoted([FromRoute] int id, string user)
     {
-        var vote = await _votesService.GetByIdAsync(id);
+        try
+        {
+            var vote = await _votesService.GetByIdAsync(id);
         
-        var voted = vote.VoteParticipations.Any(x => x.UserId == user);
+            var voted = vote.VoteParticipations.Any(x => x.UserId == user);
 
-        return Ok(voted);
+            return Ok(voted);
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(new { message =  ex.Message});
+        }
     }
 
     /// <summary>
@@ -212,15 +236,22 @@ public class VotesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetVoteResults(int id)
     {
-        var vote = await _votesService.GetByIdAsync(id);
-        
-        if (vote.End > DateTime.UtcNow)
+        try
         {
-            return BadRequest("Voting is still open. Results are not available yet.");
-        }
+            var vote = await _votesService.GetByIdAsync(id);
+            
+            if (vote.End > DateTime.UtcNow)
+            {
+                return BadRequest("Voting is still open. Results are not available yet.");
+            }
 
-        var results = await _anonymousVotesService.GetVoteResultsAsync(id);
-        return Ok(new { results });
+            var results = await _anonymousVotesService.GetVoteResultsAsync(id);
+            return Ok(new { results });
+        }
+        catch (EntityNotFoundException ex)
+        {
+            return NotFound(new { message =  ex.Message});
+        }
     }
 
 }

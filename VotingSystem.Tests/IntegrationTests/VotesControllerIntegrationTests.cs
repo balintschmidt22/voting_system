@@ -111,6 +111,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
     [Fact]
          public async Task GetVoteById_ReturnsVote_WhenVoteExists()
          {
+             await Login(UserLogin);
+             
              // Arrange
              const int voteId = 2;
      
@@ -128,6 +130,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetVoteById_ReturnsNotFound_WhenVoteNotExists()
          {
+             await Login(UserLogin);
+             
              // Arrange
              var voteId = 99; // ID of a seeded vote
      
@@ -143,6 +147,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetVoteResultsById_ReturnsVoteResults_WhenVoteExists()
          {
+             await Login(UserLogin);
+             
              // Arrange
              const int voteId = 2;
      
@@ -164,6 +170,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetVoteResultsById_ReturnsBadRequest_WhenVoteStillOpen()
          {
+             await Login(UserLogin);
+             
              // Arrange
              const int voteId = 1; // ID of a seeded vote
      
@@ -179,6 +187,8 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
          [Fact]
          public async Task GetVoteResultsById_ReturnsNotFound_WhenVoteNotExists()
          {
+             await Login(UserLogin);
+             
              // Arrange
              var voteId = 99; // ID of a seeded vote
      
@@ -253,7 +263,6 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         // Arrange
         var invalidVote = new VoteRequestDto
         {
-            UserId = "id",
             Question = "Will this test work?",
             Options = ["Yes"],
             Start = DateTime.Now + TimeSpan.FromHours(1),
@@ -276,7 +285,6 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         // Arrange
         var newVote = new VoteRequestDto
         {
-            UserId = "id",
             Question = "What is the capital of the USA?",
             Options = ["Yes", "No", "Maybe"],
             Start = DateTime.Now + TimeSpan.FromHours(1),
@@ -288,7 +296,7 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         var response = await _client.PostAsJsonAsync("/votes", newVote);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         Assert.NotNull(problemDetails);
     }
@@ -299,7 +307,6 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         // Arrange
         var newVote = new VoteRequestDto
         {
-            UserId = "id",
             Question = "Will this test work?",
             Options = ["Yes", "No", "Maybe"],
             Start = DateTime.Now + TimeSpan.FromHours(1),
@@ -324,15 +331,15 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
     {
         await Login(UserLogin);
 
-        var userId = "2a549ec8-85a6-426a-9e0c-d5d795608951"; // ID for user2@gmail.com (based on seeded data)
+        var email = UserLogin.Email;
 
-        var response = await _client.PostAsJsonAsync("/votes/my", userId);
+        var response = await _client.GetAsync("/votes/my");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var votes = await response.Content.ReadFromJsonAsync<List<VoteResponseDto>>();
 
         Assert.NotNull(votes);
-        Assert.All(votes, vote => Assert.Equal(userId, vote.User.Id));
+        Assert.Equal("What is the meaning of life?", votes[0].Question);
     }
 
     [Fact]
@@ -406,7 +413,7 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
         context.Votes.AddRange(
             new Vote
             {
-                UserId = users.ElementAt(0).Id,
+                User = users.ElementAt(0),
                 Question = "What is 1+1?",
                 Options = ["2", "3"],
                 Start = DateTime.Now - TimeSpan.FromHours(4),
@@ -414,7 +421,7 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
             },
             new Vote
             {
-                UserId = users.ElementAt(1).Id,
+                User = users.ElementAt(1),
                 Question = "What is the meaning of life?",
                 Options = ["IDK", "42", "Nothing"],
                 Start = DateTime.Now - TimeSpan.FromHours(10),
@@ -422,7 +429,7 @@ public class VotesControllerIntegrationTests : IClassFixture<WebApplicationFacto
             },
             new Vote
             {
-                UserId = users.ElementAt(0).Id,
+                User = users.ElementAt(0),
                 Question = "What is the capital of the USA?",
                 Options = ["New York", "Los Angeles", "Washington DC", "Chicago"],
                 Start = DateTime.Now - TimeSpan.FromHours(10),

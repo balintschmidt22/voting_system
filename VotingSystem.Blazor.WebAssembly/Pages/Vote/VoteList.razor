@@ -38,8 +38,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var id = await JsRuntime.InvokeAsync<string>("localStorage.getItem", ["Id"]);
-        _votes = await VoteService.GetMyVotesAsync(id);
+        _votes = await VoteService.GetMyVotesAsync();
         _isLoading = false;
     }
 }

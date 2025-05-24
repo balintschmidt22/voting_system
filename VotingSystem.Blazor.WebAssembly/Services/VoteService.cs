@@ -79,14 +79,14 @@ namespace VotingSystem.Blazor.WebAssembly.Services
             }
         }
 
-        public async Task<List<VoteViewModel>> GetMyVotesAsync(string userId)
+        public async Task<List<VoteViewModel>> GetMyVotesAsync()
         {
             try
             {
-                var response = await _httpRequestUtility.ExecutePostHttpRequestAsync<string, List<VoteResponseDto>>(
-                    "votes/my", userId);
+                var response = await _httpRequestUtility.ExecuteGetHttpRequestAsync<List<VoteResponseDto>>(
+                    "votes/my");
                 
-                return _mapper.Map<List<VoteViewModel>>(response);
+                return _mapper.Map<List<VoteViewModel>>(response.Response);
             }
             catch (HttpRequestErrorException exp)
             {

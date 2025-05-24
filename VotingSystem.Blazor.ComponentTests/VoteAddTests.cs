@@ -60,7 +60,7 @@ public class VoteAddTests : IDisposable
             .ReturnsAsync(new List<UserViewModel>());
         
         _voteServiceMock
-            .Setup(svc => svc.GetMyVotesAsync(It.IsAny<string>()))
+            .Setup(svc => svc.GetMyVotesAsync())
             .ReturnsAsync(_testVotes);
         
         _voteServiceMock.Setup(x => x.GetVotesAsync(It.IsAny<bool>()))
@@ -134,7 +134,7 @@ public class VoteAddTests : IDisposable
         _voteServiceMock.Setup(x => x.GetVoteByIdAsync(3))
             .ReturnsAsync(newVote);
 
-        _voteServiceMock.Setup(x => x.GetMyVotesAsync(It.IsAny<string>()))
+        _voteServiceMock.Setup(x => x.GetMyVotesAsync())
             .ReturnsAsync(new List<VoteViewModel>());
 
         _context.Services.AddSingleton(_voteServiceMock.Object);

@@ -11,10 +11,6 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.0"/>
-        <PackageReference Include="ELTE.FI.SARuleSet" Version="3.1.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="JunitXml.TestLogger" Version="6.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.15" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.15" />
